@@ -15,13 +15,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class GraphView extends RelativeLayout implements View.OnTouchListener{
+public class GraphView extends RelativeLayout implements View.OnTouchListener {
 
     private static final int COLOR_GREEN = 0xFF55FF66;
     private static final int COLOR_RED = 0xFFFF5566;
     private static final int COLOR_DARK_GREEN = 0xAA55FF66;
     private static final int COLOR_DARK_RED = 0xAAFF5566;
-    private static final int BLUE = 0xFFFFFFEE;
+    private static final int WHITE = 0xFFFFFFEE;
 
     private List<Float> dataSet;
     private List<Float> reducedDataSet;
@@ -70,7 +70,7 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
         super(context, attrs, defStyleAttr);
     }
 
-    public void init(List<Float> data){
+    public void init(List<Float> data) {
         this.dataSet = data;
 
         paint = new Paint();
@@ -78,7 +78,7 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
         dataPaint.setAntiAlias(true);
         dataPaint.setStyle(Paint.Style.STROKE);
         dataPaint.setStrokeWidth(5);
-        dataPaint.setColor(BLUE);
+        dataPaint.setColor(WHITE);
 
         fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         fillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -101,8 +101,10 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
         //dataSet = generateData();
         reducedDataSet = new ArrayList<Float>();
 
-        if (dataSet.isEmpty()) {min = 0; max = 0;}
-        else {
+        if (dataSet.isEmpty()) {
+            min = 0;
+            max = 0;
+        } else {
             min = Collections.min(dataSet);
             if (min > 0) min = 0;
             max = Collections.max(dataSet);
@@ -119,8 +121,8 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
         List<Float> data = new ArrayList<>();
         data.add((float) rand.nextInt(6000) - 3000);
         String string = "" + data.get(0);
-        for (int i = 1 ; i < num; i++) {
-            data.add((data.get(i-1) + (float) rand.nextInt(6000) - 3000));
+        for (int i = 1; i < num; i++) {
+            data.add((data.get(i - 1) + (float) rand.nextInt(6000) - 3000));
             string += " , " + data.get(i);
         }
         System.out.println(string);
@@ -130,17 +132,17 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
     @Override
     public void onDraw(Canvas canvas) {
 
-            if (initHeight == 0) initHeight = getHeight();
+        if (initHeight == 0) initHeight = getHeight();
 
-            segmentWidth = Math.max((getWidth() - paddingLeft) / 8, (getWidth() - paddingLeft) / (dataSet.size()));
-            overflow = segmentWidth * dataSet.size() - getWidth() + paddingLeft;
+        segmentWidth = Math.max((getWidth() - paddingLeft) / 8, (getWidth() - paddingLeft) / (dataSet.size()));
+        overflow = segmentWidth * dataSet.size() - getWidth() + paddingLeft;
 
-            if (move) {
-                scrollDist = (int) overflow;
-                move = false;
-            }
-            offset = (int) (scrollDist / segmentWidth);
-            int numVisible = (int) ((getWidth() + scrollDist) / segmentWidth) - offset - 1;
+        if (move) {
+            scrollDist = (int) overflow;
+            move = false;
+        }
+        offset = (int) (scrollDist / segmentWidth);
+        int numVisible = (int) ((getWidth() + scrollDist) / segmentWidth) - offset - 1;
 
         if (!dataSet.isEmpty()) {
             reducedDataSet.clear();
@@ -182,7 +184,7 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
             path.moveTo(paddingLeft, y);
 
             // DRAW BORDER
-            paint.setColor(BLUE);
+            paint.setColor(WHITE);
             dashedPath.reset();
             dashedPath.moveTo(paddingLeft, 0);
             dashedPath.lineTo(paddingLeft, getHeight());
@@ -200,7 +202,7 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
             for (int i = 0; i < 3; i++) {
                 boolean draw = (i == 0 && max == 0) || (i == 2 && min == 0);
                 y = getHeight() - (fl[i] - min) * unitHeight - paddingBottom;
-                paint.setColor(BLUE);
+                paint.setColor(WHITE);
                 if (i == 2) {
                     fillPaint.setColor(COLOR_RED);
                     canvas.drawRect(paddingLeft, y, getWidth(), getHeight(), fillPaint);
@@ -234,12 +236,12 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
             for (int i = 0; i < 3; i++) {
                 boolean draw = (i == 0 && max == 0) || (i == 2 && min == 0);
                 y = getHeight() - (fl[i] - min) * unitHeight - paddingBottom;
-                paint.setColor(BLUE);
+                paint.setColor(WHITE);
                 if (i == 2) {
                     textPaint.setColor(COLOR_RED);
                 }
                 if (i == 1) {
-                    textPaint.setColor(BLUE);
+                    textPaint.setColor(WHITE);
                 }
                 if (i == 0) {
                     textPaint.setColor(COLOR_GREEN);
@@ -263,15 +265,38 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
                     canvas.drawPath(path, paint);
                 }
             }
+        } else {
+            float y = getHeight() / 2;
+
+            // DRAW COLOUR
+            fillPaint.setColor(COLOR_RED);
+            canvas.drawRect(paddingLeft, getHeight() - paddingBottom, getWidth(), getHeight(), fillPaint);
+
+            fillPaint.setColor(COLOR_GREEN);
+            canvas.drawRect(paddingLeft, 0, getWidth(), paddingTop, fillPaint);
+
+            fillPaint.setColor(COLOR_DARK_GREEN);
+            canvas.drawRect(paddingLeft, paddingTop, getWidth(), y, fillPaint);
+
+            fillPaint.setColor(COLOR_DARK_RED);
+            canvas.drawRect(paddingLeft, y, getWidth(), getHeight(), fillPaint);
+
+            // DRAW LINES
+            paint.setColor(WHITE);
+            paint.setStrokeWidth(2);
+            canvas.drawLine(paddingLeft, paddingTop, getWidth(), paddingTop, paint);
+            canvas.drawLine(paddingLeft, getHeight()-paddingBottom, getWidth(), getHeight()-paddingBottom, paint);
+            canvas.drawLine(paddingLeft, y, getWidth(), y, paint);
+            canvas.drawLine(paddingLeft, paddingTop, paddingLeft, getHeight()-paddingBottom, paint);
         }
         //drawVerticalLines(canvas, dataSet);
     }
 
-    public float toTenths(float time){
+    public float toTenths(float time) {
         int seconds = (int) (time / 1000);
         int dec = (int) (time / 100);
         dec %= 10;
-        return (seconds) + ((float)dec)/10;
+        return (seconds) + ((float) dec) / 10;
     }
 
     @Override
@@ -291,8 +316,7 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
                     invalidate();
                 }
             }
-        }
-        else {
+        } else {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN: {
                     initScrollDist = scrollDist + (int) event.getX();
@@ -317,20 +341,20 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
     }
 
     @SuppressWarnings("unused")
-    public void notifyDataSetChanged(){
+    public void notifyDataSetChanged() {
         invalidate();
     }
 
-    public void moveToLast(){
-        move  = true;
+    public void moveToLast() {
+        move = true;
     }
 
-    public void reset(){
+    public void reset() {
         scrollDist = 0;
         invalidate();
     }
 
-    public void drawData(Canvas c, List<Float> data){
+    public void drawData(Canvas c, List<Float> data) {
 
         float prevX, prevY, x, y;
         prevX = paddingLeft - (scrollDist % segmentWidth);
@@ -348,13 +372,13 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
 
         fillPaint.setColor(COLOR_DARK_RED);
         fillPath.moveTo(paddingLeft, getHeight() - paddingBottom);
-        fillPath.lineTo(getWidth(),getHeight() - paddingBottom);
-        fillPath.lineTo(getWidth(),zeroY);
-        fillPath.lineTo(paddingLeft,zeroY);
+        fillPath.lineTo(getWidth(), getHeight() - paddingBottom);
+        fillPath.lineTo(getWidth(), zeroY);
+        fillPath.lineTo(paddingLeft, zeroY);
         c.drawPath(fillPath, fillPaint);
         fillPath.reset();
 
-        for (int i = 1; i < data.size(); i++){
+        for (int i = 1; i < data.size(); i++) {
             x = (segmentWidth * (i)) + paddingLeft - (scrollDist % segmentWidth);
             y = getHeight() - (data.get(i) - min) * unitHeight - paddingBottom;
 
@@ -364,22 +388,22 @@ public class GraphView extends RelativeLayout implements View.OnTouchListener{
             prevY = y;
         }
 
-        paint.setColor(BLUE);
-        for (int i = 0; i < data.size(); i++){
+        paint.setColor(WHITE);
+        for (int i = 0; i < data.size(); i++) {
             x = (segmentWidth * (i)) + paddingLeft - (scrollDist % segmentWidth);
             y = getHeight() - (data.get(i) - min) * unitHeight - paddingBottom;
 
             if (data.get(i) > 0) fillPaint.setColor(COLOR_GREEN);
             else fillPaint.setColor(COLOR_RED);
-            c.drawCircle(x, y ,12, fillPaint);
-            c.drawCircle(x, y ,12, paint);
+            c.drawCircle(x, y, 12, fillPaint);
+            c.drawCircle(x, y, 12, paint);
         }
     }
 
     @SuppressWarnings("unused")
-    public void drawVerticalLines(Canvas c, List<Float> data){
-        float x,y;
-        for (int i = 0; i < data.size(); i++){
+    public void drawVerticalLines(Canvas c, List<Float> data) {
+        float x, y;
+        for (int i = 0; i < data.size(); i++) {
             x = (segmentWidth * (i + 1)) + paddingLeft - scrollDist;
             y = getHeight() - (data.get(i) - min) * unitHeight - paddingBottom;
 
