@@ -1,0 +1,30 @@
+<philoats.celerysplit.views.SettingsView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="philoats.celerysplit.fragments.SettingsFragment">
+
+    <android.support.v7.widget.Toolbar
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_gravity="center_horizontal|top"
+        android:id="@+id/toolbar"
+        android:background="@color/toolbar"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/drop_shadow_height"
+        android:layout_below="@id/toolbar"
+        android:background="@drawable/gradient_top"
+        android:id="@+id/listBottom"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/screen_settings_show_graph"
+        android:id="@+id/graph_check"
+        android:layout_gravity="center"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
+
+</philoats.celerysplit.views.SettingsView>

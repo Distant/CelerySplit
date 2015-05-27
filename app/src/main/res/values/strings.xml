@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="app_name">Celery Split</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_load_splits">LoadSplits</string>
-    <string name="title_activity_test">test</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
+    <string name="app_name" translatable="false">Celery Split</string>
+    <string name="action_settings" translatable="false">Settings</string>
+    <string name="title_activity_load_splits" translatable="false">LoadSplits</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="save_button" translatable="false">SAVE</string>
+    <string name="save_button_desc" translatable="false">Save Button</string>
+    <string name="plus_button" translatable="false">Add Split</string>
+    <string name="plus_button_desc" translatable="false">Plus Button</string>
+    <string name="edit_split_default_title" translatable="false">TITLE_DEFAULT</string>
+    <string name="dual_item_left_default" translatable="false">LEFT</string>
+    <string name="dual_item_right_default" translatable="false">RIGHT</string>
+    <string name="layered_item_left_default" translatable="false">LEFT</string>
+    <string name="layered_item_edit" translatable="false">EDIT</string>
+    <string name="layered_item_delete" translatable="false">DELETE</string>
+    <string name="screen_settings_no_settings" translatable="false">No Settings Yet</string>
+    <string name="screen_splits_create" translatable="false">CREATE</string>
+    <string name="screen_splits_create_desc" translatable="false">Create Button</string>
+    <string name="screen_timer_default_time" translatable="false">0:00</string>
+    <string name="screen_timer_start" translatable="false">Start</string>
+    <string name="screen_timer_unsplit" translatable="false">Unsplit</string>
+    <string name="screen_timer_pause" translatable="false">Pause</string>
+    <string name="screen_timer_done" translatable="false">Done</string>
+    <string name="screen_timer_reset" translatable="false">Reset</string>
+    <string name="tab_default_text" translatable="false">Default Text</string>
+    <string name="screen_edit_title_header">Title</string>
+    <string name="screen_edit_segments_header">Segments</string>
+    <string name="edit">EDIT</string>
+    <string name="screen_settings_show_graph">Show graph</string>
+    <string-array name="compareSelection" translatable="false">
+        <item>PB Times</item>
+        <item>Best Segments</item>
+    </string-array>
 </resources>

@@ -1,0 +1,118 @@
+<philoats.celerysplit.views.EditRunView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/midnight_grey"
+    tools:context="philoats.celerysplit.fragments.EditSplitFragment"
+    android:descendantFocusability="afterDescendants">
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/space2"
+        />
+
+    <android.support.v7.widget.Toolbar
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:id="@+id/toolbar"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@color/toolbar"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="right">
+
+            <Button
+                android:layout_width="64dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/saveButton"
+                android:src="@drawable/ic_launcher"
+                android:text="@string/save_button"
+                android:background="#00ffffff"
+                android:contentDescription="@string/save_button_desc"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#ffffffff"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/plusButton"
+                android:text="@string/plus_button"
+                android:background="#00ffffff"
+                android:src="@drawable/ic_launcher"
+                android:contentDescription="@string/plus_button_desc"/>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/drop_shadow_height"
+        android:layout_below="@id/toolbar"
+        android:background="@drawable/gradient_top"
+        android:id="@+id/toolbar_shadow"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:id="@+id/space"
+        android:layout_below="@+id/toolbar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/edit_split_default_title"
+        android:id="@+id/titleView"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:layout_below="@+id/space"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="14sp"
+        android:text="@string/edit"
+        android:id="@+id/titleViewEdit"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:paddingLeft="4dp"
+        android:layout_toRightOf="@+id/titleView"
+        android:layout_below="@id/space"
+        android:layout_alignBaseline="@id/titleView"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:id="@+id/space2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/titleView"/>
+
+</philoats.celerysplit.views.EditRunView>

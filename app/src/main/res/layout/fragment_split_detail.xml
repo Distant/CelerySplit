@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="bdoty.celerysplit.fragments.SplitDetailFragment"
+    tools:context="philoats.celerysplit.fragments.SplitDetailFragment"
     android:id="@+id/rl">
 
     <ListView android:id="@android:id/list" android:layout_width="match_parent"

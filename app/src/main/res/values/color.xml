@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="off_white">#ffefefef</color>
-    <color name="toolbar">#ff23232c</color>
-    <color name="midnight_grey">#ff292934</color>
+    <color name="toolbar">#ff1D77B2</color>
+    <color name="midnight_grey">#ff215A7F</color>
+    <color name="midnight_grey_dark">#ff1D3E51</color>
     <color name="tab_indicator">#ffc0c0c0</color>
-    <color name="split_indicator">#ff2F2F39</color>
+    <color name="split_indicator">#ff215A7F</color>
     <color name="white_opaque">#ffefefef</color>
     <color name="pastel_red">#FFFF7777</color>
     <color name="pastel_green">#FF77FF77</color>
@@ -12,6 +13,6 @@
     <color name="pastel_red_dark">#FFCC2233</color>
     <color name="pastel_green_dark">#FF22CC33</color>
 
-    <color name="split_inactive_text">#ff777777</color>
+    <color name="split_inactive_text">#ff999999</color>
 
     </resources>
