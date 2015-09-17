@@ -1,2 +1,0 @@
-configurations.create("default")
-artifacts.add("default", file('rxjava-1.0.7.jar'))
