@@ -118,14 +118,15 @@ public class ContainerPanel extends ViewPager implements Container<ContainerView
     }
 
     public void loadView(int pos) {
-        loadView(pos, true);
+        loadView(pos, false);
     }
 
     @Override
     public boolean onBackPressed() {
         if (views.get(currentPosition).onBack()) return true;
         if (currentPosition > 0) {
-            loadView(backStack.pop(), false);
+            if (backStack.size() > 0) loadView(backStack.pop(), false);
+            else loadView(0, false);
             return true;
         }
         return false;
