@@ -190,6 +190,7 @@ public class TimerView extends RelativeLayout implements ContainerView, SharedPr
     @Override
     public void onAttachedToWindow(){
         getContext().getSharedPreferences("timerPreferences", Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
+        super.onAttachedToWindow();
     }
 
     @Override
@@ -266,6 +267,7 @@ public class TimerView extends RelativeLayout implements ContainerView, SharedPr
         timerStartButton.setText(PAUSE_TEXT);
         timerUnsplitButton.setEnabled(true);
         timerSplit.setEnabled(true);
+        list.setSelection(position);
     }
 
     public void pause(){
