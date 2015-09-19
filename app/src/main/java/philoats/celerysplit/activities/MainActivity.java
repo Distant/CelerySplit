@@ -2,14 +2,17 @@ package philoats.celerysplit.activities;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+
+import java.io.File;
 
 import javax.inject.Inject;
 
 import philoats.celerysplit.R;
-import philoats.celerysplit.models.SplitSet;
 import philoats.celerysplit.presenters.RunListPresenter;
-import philoats.celerysplit.presenters.RunListPresenter.SplitFragmentListener;
 import philoats.celerysplit.presenters.SettingsPresenter;
 import philoats.celerysplit.presenters.TimerPresenter;
 import philoats.celerysplit.views.RunListView;
@@ -17,7 +20,7 @@ import philoats.celerysplit.views.SettingsView;
 import philoats.celerysplit.views.TimerView;
 import philoats.celerysplit.views.customtabpanel.TabPanel;
 
-public class MainActivity extends BaseActivity implements SplitFragmentListener {
+public class MainActivity extends BaseActivity {
     private ContainerPanel container;
 
     @Inject
@@ -29,6 +32,10 @@ public class MainActivity extends BaseActivity implements SplitFragmentListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        String path = Environment.getExternalStorageDirectory().toString() + "/CelerySplit/Import";
+        File dir = new File(path);
+        if (!dir.exists()) dir.mkdirs();
+
         container = (ContainerPanel) findViewById(R.id.container);
         container.start();
 
@@ -39,7 +46,12 @@ public class MainActivity extends BaseActivity implements SplitFragmentListener 
         timerView.initialise(timerPresenter);
         container.registerView(timerView);
 
-        RunListPresenter runListPresenter = new RunListPresenter(this, this);
+        RunListPresenter runListPresenter = new RunListPresenter(this, (splitSet -> {
+            timerPresenter.setLoadedSplits(splitSet);
+            timerView.reset();
+            container.loadView(0);
+        }));
+
         RunListView runListView = (RunListView) getLayoutInflater().inflate(R.layout.screen_runs_list, container, false);
         runListView.initialise(runListPresenter);
         container.registerView(runListView);
@@ -60,7 +72,7 @@ public class MainActivity extends BaseActivity implements SplitFragmentListener 
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.ECLAIR
                 && keyCode == KeyEvent.KEYCODE_BACK
                 && event.getRepeatCount() == 0) {
@@ -68,12 +80,5 @@ public class MainActivity extends BaseActivity implements SplitFragmentListener 
         }
 
         return super.onKeyDown(keyCode, event);
-    }
-
-    @Override
-    public void onLoadSplits(SplitSet set) {
-        timerPresenter.setLoadedSplits(set);
-        timerView.reset();
-        container.loadView(0);
     }
 }
