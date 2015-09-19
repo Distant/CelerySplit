@@ -1,6 +1,8 @@
 package philoats.celerysplit.views;
 
 import android.content.Context;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
@@ -8,7 +10,6 @@ import android.util.AttributeSet;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import philoats.celerysplit.presenters.RunListPresenter;
 import rx.Observable;
 import rx.functions.Action1;
 
-public class EditRunView extends RelativeLayout{
+public class EditRunView extends CoordinatorLayout {
 
     private static final int EDIT_LIST_ITEM = R.layout.list_item_dual_edit;
 
@@ -67,11 +68,11 @@ public class EditRunView extends RelativeLayout{
         listView.setOnItemClickListener((parent, view, position, id) -> {
 
             String text = adapter.getItem(position);
-            alertForInput(text, position);
+            showEditSplitDialog(text, position);
         });
 
-        Button plusButton = (Button) findViewById(R.id.plusButton);
-        plusButton.setOnClickListener(v -> alertForInput());
+        FloatingActionButton plusButton = (FloatingActionButton) findViewById(R.id.fab_add);
+        plusButton.setOnClickListener(v -> showEditSplitDialog());
 
         Button saveButton = (Button) findViewById(R.id.saveButton);
         saveButton.setOnClickListener(v -> {
@@ -109,7 +110,7 @@ public class EditRunView extends RelativeLayout{
 
     }
 
-    public void alertForInput(String curName, final int state)
+    public void showEditSplitDialog(String curName, final int state)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(state == -1 ? "New Split" : "Edit Split");
@@ -130,9 +131,9 @@ public class EditRunView extends RelativeLayout{
         builder.show();
     }
 
-    public void alertForInput()
+    public void showEditSplitDialog()
     {
-        alertForInput("", -1);
+        showEditSplitDialog("", -1);
     }
 
     public Observable<Boolean> loadSplits(final Run run)
