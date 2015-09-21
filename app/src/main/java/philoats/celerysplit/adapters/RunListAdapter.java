@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import philoats.celerysplit.R;
 import philoats.celerysplit.models.Run;
-import philoats.celerysplit.views.SwipeableItem;
+import philoats.celerysplit.views.LongPressItem;
 
 public class RunListAdapter extends ArrayAdapter<Run> {
 
@@ -30,9 +30,6 @@ public class RunListAdapter extends ArrayAdapter<Run> {
         this.runs = runs;
         this.list = list;
         this.listener = listener;
-        list.setOnFocusChangeListener((v, hasFocus) -> {
-            //SwipeableItem.getSelected().deselect();
-        });
     }
 
     @Override
@@ -55,7 +52,10 @@ public class RunListAdapter extends ArrayAdapter<Run> {
         holder.delete.setOnClickListener(v -> listener.onDeleteButtonPressed(runs.get(position)));
         holder.delete.setClickable(false);
 
-        holder.edit.setOnClickListener(v -> listener.onEditButtonPressed(runs.get(position)));
+        holder.edit.setOnClickListener(v -> {
+            listener.onEditButtonPressed(runs.get(position));
+            LongPressItem.getSelected().deselect();
+        });
         holder.edit.setClickable(false);
 
         RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.relLayout);
@@ -64,7 +64,7 @@ public class RunListAdapter extends ArrayAdapter<Run> {
         params.leftMargin = 0;
         layout.setLayoutParams(params);
 
-        ((SwipeableItem) view).setSwipeable(list);
+        ((LongPressItem) view).setList(list);
         return view;
     }
 
@@ -74,12 +74,13 @@ public class RunListAdapter extends ArrayAdapter<Run> {
     }
 
     @Override
-    public Run getItem(int pos){
+    public Run getItem(int pos) {
         return runs.get(pos);
     }
 
     public interface ButtonListener {
         public void onEditButtonPressed(Run run);
+
         public void onDeleteButtonPressed(Run run);
     }
 
