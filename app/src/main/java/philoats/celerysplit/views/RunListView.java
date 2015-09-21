@@ -121,7 +121,6 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Ada
 
     @Override
     public void onEditButtonPressed(Run run) {
-        SwipeableItem.getSelected().deselect();
         editRunView.loadSplits(run)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(b -> showEdit());
@@ -143,7 +142,7 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Ada
         if (editRunView.getParent() != null) {
             hideEdit();
         }
-        SwipeableItem.reset();
+        LongPressItem.reset();
     }
 
     @Override
