@@ -5,27 +5,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import philoats.celerysplit.R;
 import philoats.celerysplit.models.SplitSet;
 import philoats.celerysplit.presenters.TimerPresenter;
+import philoats.celerysplit.views.LongPressItem;
 
 public class EditArrayAdapter extends ArrayAdapter<String> {
 
     private final Context context;
     private final int resource;
     private final SplitSet set;
-    private ArrayList<String> names;
+    private ListView list;
+    private LayeredListAdapter.ButtonListener listener;
 
-    public EditArrayAdapter(Context context, int id, SplitSet set, ArrayList<String> names) {
-        super(context, id);
+    public EditArrayAdapter(Context context, SplitSet set, ListView list, LayeredListAdapter.ButtonListener listener) {
+        super(context, R.layout.list_item_dual_edit);
         this.context = context;
-        this.resource = id;
+        this.resource = R.layout.list_item_dual_edit;
         this.set = set;
-        this.names = names;
+        this.listener = listener;
+        this.list = list;
     }
 
     @Override
@@ -42,18 +48,37 @@ public class EditArrayAdapter extends ArrayAdapter<String> {
             holder = (ViewHolder) view.getTag();
         }
 
-        holder.left.setText(names.get(position));
+        view.clearFocus();
+
+        holder.left.setText(set.getName(position));
         if (position < set.getCount()) {
-            holder.right.setText(TimerPresenter.toTimeString(set.pbTimes[position], false));
+            holder.right.setText(TimerPresenter.toTimeString(set.getPbTime(position), false));
         } else {
             holder.right.setText("-");
         }
+
+        holder.delete.setOnClickListener(v -> listener.onDeleteButtonPressed(position));
+        holder.delete.setClickable(false);
+
+        holder.edit.setOnClickListener(v -> {
+            listener.onEditButtonPressed(position);
+            LongPressItem.getSelected().deselect();
+        });
+        holder.edit.setClickable(false);
+
+        RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.relLayout);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) layout.getLayoutParams();
+        params.rightMargin = 0;
+        params.leftMargin = 0;
+        layout.setLayoutParams(params);
+
+        ((LongPressItem) view).setList(list);
         return view;
     }
 
     @Override
     public int getCount() {
-        return names.size();
+        return set.getCount();
     }
 
     @Override
@@ -63,21 +88,24 @@ public class EditArrayAdapter extends ArrayAdapter<String> {
 
     @Override
     public String getItem(int pos){
-        return names.get(pos);
+        return set.getName(pos);
     }
 
-    public ArrayList<String> getNames() {
-        return names;
+    public List getNames() {
+        return Arrays.asList(set.getNames());
     }
 
     private static class ViewHolder {
         public TextView left;
         public TextView right;
+        public TextView delete;
+        public TextView edit;
 
         public ViewHolder(View view) {
             left = (TextView) view.findViewById(R.id.textLeft);
             right = (TextView) view.findViewById(R.id.textRight);
-
+            delete = (TextView) view.findViewById(R.id.deleteButton);
+            edit = (TextView) view.findViewById(R.id.editButton);
         }
     }
 }
