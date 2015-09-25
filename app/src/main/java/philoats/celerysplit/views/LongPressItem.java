@@ -1,13 +1,12 @@
 package philoats.celerysplit.views;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,7 +28,6 @@ public class LongPressItem extends RelativeLayout implements View.OnTouchListene
 
     private static final int NONE = 0;
     private static final int RL = 1;
-    private static final int LR = 2;
 
     public LongPressItem(Context context) {
         super(context);
@@ -89,19 +87,21 @@ public class LongPressItem extends RelativeLayout implements View.OnTouchListene
                 return true;
             }
             case MotionEvent.ACTION_MOVE: {
-                list.requestDisallowInterceptTouchEvent(true);
                 int dx = (int) (x - event.getX());
-                if (Math.abs(dx) > 10) didMove = true;
+                if (Math.abs(dx) > 10) {
+                    didMove = true;
+                    layout.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.midnight_grey));
+                }
                 return true;
             }
             case MotionEvent.ACTION_UP: {
                 layout.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.midnight_grey));
-                list.requestDisallowInterceptTouchEvent(false);
                 if (!didMove) list.performItemClick(v, list.getPositionForView(v), 0);
                 didMove = false;
                 return true;
             }
             case MotionEvent.ACTION_CANCEL: {
+                layout.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.midnight_grey));
                 return false;
             }
         }
@@ -122,19 +122,16 @@ public class LongPressItem extends RelativeLayout implements View.OnTouchListene
 
     private void doAnim(final int target) {
         params = (RelativeLayout.LayoutParams) layout.getLayoutParams();
-        final int start = params.rightMargin;
-        final int dif = target - start;
-        Animation a = new Animation() {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                params = (RelativeLayout.LayoutParams) layout.getLayoutParams();
-                params.rightMargin = start + (int) ((dif) * interpolatedTime);
-                layout.setLayoutParams(params);
-            }
-        };
-
-        a.setDuration(130); // in ms
-        layout.startAnimation(a);
+        ValueAnimator anim = ValueAnimator.ofInt(params.rightMargin, target);
+        anim.addUpdateListener(valueAnimator -> {
+            int val = (Integer) valueAnimator.getAnimatedValue();
+            params = (LayoutParams) layout.getLayoutParams();
+            params.rightMargin = val;
+            params.leftMargin = 0 - val;
+            layout.setLayoutParams(params);
+        });
+        anim.setDuration(130);
+        anim.start();
     }
 
     public static LongPressItem getSelected() {
