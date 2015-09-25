@@ -12,32 +12,22 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import philoats.celerysplit.R;
 import philoats.celerysplit.adapters.EditArrayAdapter;
-import philoats.celerysplit.data.RunDataAccess;
+import philoats.celerysplit.adapters.LayeredListAdapter;
 import philoats.celerysplit.models.Run;
 import philoats.celerysplit.models.SplitSet;
 import philoats.celerysplit.presenters.EditRunPresenter;
-import philoats.celerysplit.presenters.RunListPresenter;
 import rx.Observable;
 import rx.functions.Action1;
 
-public class EditRunView extends CoordinatorLayout {
+public class EditRunView extends CoordinatorLayout implements LayeredListAdapter.ButtonListener {
 
-    private static final int EDIT_LIST_ITEM = R.layout.list_item_dual_edit;
-
-    private EditRunPresenter.EditListener listener;
+    private EditRunPresenter presenter;
     private TextView titleView;
     private Toolbar toolbar;
     private ListView listView;
     private EditArrayAdapter adapter;
-
-    private boolean inEditMode = false;
-    private ArrayList<String> splitNames;
-    private SplitSet currentSet;
 
     private Action1<Boolean> onComplete;
 
@@ -54,21 +44,18 @@ public class EditRunView extends CoordinatorLayout {
     }
 
     @Override
-    public void onAttachedToWindow(){
+    public void onAttachedToWindow() {
     }
 
     public void initialise(EditRunPresenter presenter) {
-        splitNames = new ArrayList<>();
-        splitNames.add("DEFAULT");
-        currentSet = SplitSet.empty();
-        adapter = new EditArrayAdapter(getContext(), EDIT_LIST_ITEM, currentSet, splitNames);
+        this.presenter = presenter;
 
         listView = (ListView) findViewById(R.id.listView);
+        adapter = new EditArrayAdapter(getContext(), presenter.getSet(), listView, this);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener((parent, view, position, id) -> {
-
             String text = adapter.getItem(position);
-            showEditSplitDialog(text, position);
+            showEditSplitDialog(presenter.getSet(), text, position);
         });
 
         FloatingActionButton plusButton = (FloatingActionButton) findViewById(R.id.fab_add);
@@ -76,18 +63,17 @@ public class EditRunView extends CoordinatorLayout {
 
         Button saveButton = (Button) findViewById(R.id.saveButton);
         saveButton.setOnClickListener(v -> {
-            String[] namesArray = splitNames.toArray(new String[splitNames.size()]);
-            if (inEditMode) listener.onFinishEdited(titleView.getText().toString(), namesArray, currentSet);
-            else listener.onFinishCreated(titleView.getText().toString(), namesArray);
+            presenter.save(titleView.getText().toString());
             onComplete.call(true);
         });
 
         titleView = (TextView) findViewById(R.id.titleView);
+
         TextView titleEditButton = (TextView) findViewById(R.id.titleViewEdit);
         titleEditButton.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            boolean isNew = titleView.getText()== "Set Title";
-            builder.setTitle(isNew? "Set Title" : "Edit Title");
+            boolean isNew = titleView.getText() == "Set Title";
+            builder.setTitle(isNew ? "Set Title" : "Edit Title");
 
             // Set up the input
             final EditText input = new EditText(getContext());
@@ -104,16 +90,16 @@ public class EditRunView extends CoordinatorLayout {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_action_back);
         toolbar.setNavigationOnClickListener(v -> {
-            listener.onCancel();
+            presenter.cancel();
             onComplete.call(true);
         });
 
+        this.presenter.currentSetObservable().subscribe(this::loadSplits);
     }
 
-    public void showEditSplitDialog(String curName, final int state)
-    {
+    private void showEditSplitDialog(SplitSet set, String curName, final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(state == -1 ? "New Split" : "Edit Split");
+        builder.setTitle(position == -1 ? "New Split" : "Edit Split");
 
         // Set up the input
         final EditText input = new EditText(getContext());
@@ -123,56 +109,51 @@ public class EditRunView extends CoordinatorLayout {
 
         // Set up the buttons
         builder.setPositiveButton("OK", (dialog, which) -> {
-            if (state == -1) splitNames.add(input.getText().toString());
-            else splitNames.set(state,input.getText().toString());
+            if (position == -1) set.addSegment(input.getText().toString(), -1, -1);
+            else set.updateSegment(position, input.getText().toString(), set.getPbTime(position), set.getBestTime(position));
             adapter.notifyDataSetChanged();
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
     }
 
-    public void showEditSplitDialog()
-    {
-        showEditSplitDialog("", -1);
+    private void showEditSplitDialog() {
+        showEditSplitDialog(presenter.getSet(), "", -1);
     }
 
-    public Observable<Boolean> loadSplits(final Run run)
-    {
-        return Observable.create(subscriber -> {
-            RunDataAccess access = new RunDataAccess(getContext());
-            access.getSet(run).subscribe(set -> {
-                currentSet = set;
-                String title = set.getTitle();
-                titleView.setText(title);
-                toolbar.setTitle("Edit Splits");
-                inEditMode = true;
-                titleView.setText(title);
-                splitNames.clear();
-                Collections.addAll(splitNames, set.names);
-                adapter = new EditArrayAdapter(getContext(), EDIT_LIST_ITEM, currentSet, splitNames);
-                listView.setAdapter(adapter);
-            });
+    public Observable<Boolean> setSplits(Run run) {
+        return Observable.create(subscriber -> presenter.setSet(run).subscribe(set -> {
             subscriber.onNext(true);
             subscriber.onCompleted();
-        });
+        }));
     }
 
-    public void createSplits()
-    {
-        titleView.setText("Set Title");
-        toolbar.setTitle("Create Splits");
-        inEditMode = false;
-        splitNames.clear();
-        currentSet = SplitSet.empty();
-        adapter = new EditArrayAdapter(getContext(), EDIT_LIST_ITEM, currentSet, splitNames);
+    private void loadSplits(SplitSet set) {
+        if (set.getCount() == 0) {
+            titleView.setText("Set Title");
+            toolbar.setTitle("Create Splits");
+        } else {
+            String title = set.getTitle();
+            titleView.setText(title);
+            toolbar.setTitle("Edit Splits");
+        }
+        adapter = new EditArrayAdapter(getContext(), presenter.getSet(), listView, this);
         listView.setAdapter(adapter);
-    }
-
-    public void setListener(RunListPresenter listener) {
-        this.listener = listener;
     }
 
     public void setOnComplete(Action1<Boolean> onComplete) {
         this.onComplete = onComplete;
+    }
+
+    @Override
+    public void onEditButtonPressed(int i) {
+        String text = adapter.getItem(i);
+        showEditSplitDialog(presenter.getSet(), text, i);
+    }
+
+    @Override
+    public void onDeleteButtonPressed(int i) {
+        presenter.getSet().deleteSegment(i);
+        adapter.notifyDataSetChanged();
     }
 }
