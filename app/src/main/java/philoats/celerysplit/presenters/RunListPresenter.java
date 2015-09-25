@@ -1,6 +1,5 @@
 package philoats.celerysplit.presenters;
 import android.content.Context;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -39,17 +38,7 @@ public class RunListPresenter implements Presenter, EditRunPresenter.EditListene
     }
 
     @Override
-    public void onFinishCreated(String title, String[] names) {
-        SplitSet set = new SplitSet(title, names);
-        dataAccess.addRun(set);
-        dataAccess.getRuns().subscribe(runSubject::onNext);
-        //parent.transitionFromEdit();
-    }
-
-    @Override
-    public void onFinishEdited(String title, String[] names, SplitSet set) {
-        SplitSet newSet = new SplitSet(set.getId(), title, names, set.pbTimes, set.bestSegments);
-        dataAccess.updateRun(newSet);
+    public void onFinishEdited() {
         dataAccess.getRuns().subscribe(runSubject::onNext);
         //parent.transitionFromEdit();
     }
