@@ -84,7 +84,7 @@ public class TimerPresenter implements Presenter {
     }
 
     private void resetDisplayTimes() {
-        displayTimes = Arrays.copyOf(loadedSplits.pbTimes, loadedSplits.getCount());
+        displayTimes = Arrays.copyOf(loadedSplits.getPbTimes(), loadedSplits.getCount());
         timeStrings = new String[displayTimes.length];
         bestTimeStrings = new String[displayTimes.length];
         for (int i = 0; i < displayTimes.length; i++) {
@@ -149,8 +149,8 @@ public class TimerPresenter implements Presenter {
             if (getCurSplit() < loadedSplits.getCount()) {
                 long time = getCurrentTime();
                 loadedSplits.update(time, curSplit);
-                displayTimes[curSplit] = time - loadedSplits.pbTimes[curSplit];
-                float pbTime = loadedSplits.pbTimes[curSplit];
+                displayTimes[curSplit] = time - loadedSplits.getPbTimes()[curSplit];
+                float pbTime = loadedSplits.getPbTimes()[curSplit];
 
                 if (pbTime > 0) {
                     graphData.add((float) time - pbTime);
@@ -158,7 +158,7 @@ public class TimerPresenter implements Presenter {
 
                 Long timeString = displayTimes[curSplit];
                 long bestSegmentTime = time - loadedSplits.bestSegmentsCum[curSplit];
-                if (loadedSplits.pbTimes[curSplit] < 0) {
+                if (loadedSplits.getPbTimes()[curSplit] < 0) {
                     timeStrings[curSplit] = toTimeString(loadedSplits.tempPB[curSplit]);
                     bestTimeStrings[curSplit] = toTimeString(loadedSplits.tempPB[curSplit]);
                     types.add(SegmentType.NEW_SPLIT);
@@ -183,16 +183,16 @@ public class TimerPresenter implements Presenter {
 
     public void unsplit() {
         curSplit--;
-        loadedSplits.tempPB[curSplit] = loadedSplits.pbTimes[curSplit];
-        displayTimes[curSplit] = loadedSplits.pbTimes[curSplit];
+        loadedSplits.tempPB[curSplit] = loadedSplits.getPbTimes()[curSplit];
+        displayTimes[curSplit] = loadedSplits.getPbTimes()[curSplit];
         timeStrings[curSplit] = displayTimes[curSplit] < 0 ? "-" : toTimeString(displayTimes[curSplit]);
         types.remove(types.size()-1);
-        float pbTime = loadedSplits.pbTimes[curSplit];
+        float pbTime = loadedSplits.getPbTimes()[curSplit];
         if (pbTime > 0) graphData.remove(graphData.size() - 1);
     }
 
     public boolean isBestSeg(int position) {
-        return loadedSplits.tempBest[position] > 0 && loadedSplits.pbTimes[position] > 0;
+        return loadedSplits.tempBest[position] > 0 && loadedSplits.getPbTimes()[position] > 0;
     }
 
     public void setCompare(int position) {
@@ -263,7 +263,7 @@ public class TimerPresenter implements Presenter {
     }
 
     public String[] getNames() {
-        return loadedSplits.names;
+        return loadedSplits.getNames();
     }
 
     public CompareType getCompareType(){

@@ -43,7 +43,7 @@ public class RunFileHelper {
             outWriter.write("Size=120,25" + "\r\n");
             for (int i = 0; i < set.getCount(); i++)
             {
-                outWriter.write(set.names[i] + "," + "0," + ((float) set.pbTimes[i]) / 1000 + "," + ((float) set.bestSegments[i]) / 1000 + "\r\n");
+                outWriter.write(set.getName(i) + "," + "0," + ((float) set.getPbTime(i)) / 1000 + "," + ((float) set.getBestTime(i)) / 1000 + "\r\n");
             }
             outWriter.close();
             fOut.close();

@@ -232,7 +232,7 @@ public class TimerView extends RelativeLayout implements ContainerView, SharedPr
         setAdapter();
         list.setVisibility(VISIBLE);
         listBottom.setVisibility(VISIBLE);
-        toolbar.setTitle(timerPresenter.loadedSplits.title);
+        toolbar.setTitle(timerPresenter.loadedSplits.getTitle());
         resizeToFit();
     }
 
