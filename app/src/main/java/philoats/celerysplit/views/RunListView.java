@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.View;
@@ -21,15 +20,15 @@ import java.util.ArrayList;
 import philoats.celerysplit.R;
 import philoats.celerysplit.activities.ContainerPanel;
 import philoats.celerysplit.activities.MainActivity;
-import philoats.celerysplit.adapters.RunListAdapter;
+import philoats.celerysplit.adapters.LayeredListAdapter;
 import philoats.celerysplit.models.Run;
+import philoats.celerysplit.models.SplitSet;
 import philoats.celerysplit.presenters.EditRunPresenter;
 import philoats.celerysplit.presenters.RunListPresenter;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class RunListView extends CoordinatorLayout implements ContainerView, AdapterView.OnItemClickListener, RunListAdapter.ButtonListener {
+public class RunListView extends CoordinatorLayout implements ContainerView, AdapterView.OnItemClickListener, LayeredListAdapter.ButtonListener {
 
     private ArrayAdapter<Run> listAdapter;
     private RunListPresenter runListPresenter;
@@ -53,7 +52,7 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Ada
         this.runListPresenter = presenter;
         this.runs = new ArrayList<>();
         ListView listView = (ListView) findViewById(android.R.id.list);
-        this.listAdapter = new RunListAdapter(getContext(), R.layout.list_item_layered, runs, listView, this);
+        this.listAdapter = new LayeredListAdapter(getContext(), runs, listView, this);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(this);
 
@@ -73,12 +72,11 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Ada
             if (item.getItemId() == R.id.action_import) {
                 if (runs.size() > 0) {
                     ArrayList<String> files = presenter.getImportFiles(getContext());
-                    if (files.size() == 0){
+                    if (files.size() == 0) {
                         Toast.makeText(getContext(), "No files found in /CelerySplit/Import/ to import",
                                 Toast.LENGTH_LONG).show();
-                    }
-                    else {
-                        showRunSelectDialog("File to Import", files, index -> runListPresenter.importFile(getContext(), files.get(index))); // rename file
+                    } else {
+                        ListSelectDialog.show(getContext(), "File to Import", files, index -> runListPresenter.importFile(getContext(), files.get(index))); // rename file
                     }
                 }
                 return true;
@@ -87,7 +85,7 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Ada
                 if (runs.size() > 0) {
                     ArrayList<String> titles = new ArrayList<>();
                     for (Run run : runs) titles.add(run.getTitle());
-                    showRunSelectDialog("Run to Export", titles, index -> runListPresenter.exportFile(getContext(), runs.get(index)));
+                    ListSelectDialog.show(getContext(), "Run to Export", titles, index -> runListPresenter.exportFile(getContext(), runs.get(index)));
                 }
                 return true;
             }
@@ -95,40 +93,27 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Ada
         });
 
         FloatingActionButton newSplitButton = (FloatingActionButton) findViewById(R.id.fab_add);
-        newSplitButton.setOnClickListener(v -> {
-            editRunView.createSplits();
-            showEdit();
-        });
+        newSplitButton.setOnClickListener(v -> editRunView.setSplits(null).subscribe(b -> showEdit()));
 
         ContainerPanel container = ((MainActivity) getContext()).getContainer();
         this.editRunView = (EditRunView) ((Activity) getContext()).getLayoutInflater().inflate(R.layout.subscreen_edit_split, container, false);
-        editRunView.initialise(new EditRunPresenter());
-        editRunView.setListener(runListPresenter);
+
+        EditRunPresenter editRunPresenter = new EditRunPresenter(getContext());
+        editRunPresenter.setListener(runListPresenter);
+        editRunView.initialise(editRunPresenter);
         editRunView.setOnComplete(b -> hideEdit());
     }
 
-    public void showRunSelectDialog(String title, ArrayList<String> names, Action1<Integer> itemSelect) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(title);
-        CharSequence[] titles = new CharSequence[names.size()];
-        names.toArray(titles);
-        builder.setItems(titles, (dialog, item) -> {
-            itemSelect.call(item);
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
-
     @Override
-    public void onEditButtonPressed(Run run) {
-        editRunView.loadSplits(run)
+    public void onEditButtonPressed(int i) {
+        editRunView.setSplits(runs.get(i))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(b -> showEdit());
     }
 
     @Override
-    public void onDeleteButtonPressed(Run run) {
-        runListPresenter.onDelete(run);
+    public void onDeleteButtonPressed(int i) {
+        runListPresenter.onDelete(runs.get(i));
     }
 
     @Override
