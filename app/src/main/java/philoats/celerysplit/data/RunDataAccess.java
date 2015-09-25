@@ -31,8 +31,7 @@ public class RunDataAccess {
     }
 
     public long addRun(SplitSet set) {
-        open(); // if -1 just add, if not, delete that id and add
-
+        open();
 
         ContentValues values = new ContentValues();
         values.put(RunDatabaseHelper.COLUMN_TITLE, set.getTitle());
@@ -42,9 +41,9 @@ public class RunDataAccess {
         for (int i = 0; i < set.getCount(); i++) {
             segmentValues = new ContentValues();
             segmentValues.put(RunDatabaseHelper.COLUMN_RUN_ID, insertId);
-            segmentValues.put(RunDatabaseHelper.COLUMN_SEGMENT_NAME, set.names[i]);
-            segmentValues.put(RunDatabaseHelper.COLUMN_PB_TIME, set.pbTimes[i]);
-            segmentValues.put(RunDatabaseHelper.COLUMN_BEST_SEG, set.bestSegments[i]);
+            segmentValues.put(RunDatabaseHelper.COLUMN_SEGMENT_NAME, set.getName(i));
+            segmentValues.put(RunDatabaseHelper.COLUMN_PB_TIME, set.getPbTime(i));
+            segmentValues.put(RunDatabaseHelper.COLUMN_BEST_SEG, set.getBestTime(i));
             segmentValues.put(RunDatabaseHelper.COLUMN_INDEX, i);
             database.insert(RunDatabaseHelper.TABLE_SEGMENTS, null, segmentValues);
         }
@@ -65,15 +64,61 @@ public class RunDataAccess {
     }
 
     public void updateRun(SplitSet set) {
-        open();
         if (set.getId() < 0) {
             addRun(set);
-        } else {
-            System.out.println("updating run # " + set.getId());
-            deleteRun(set.getId());
-            addRun(set);
+            return;
         }
+
+        open();
+        ContentValues values = new ContentValues();
+        values.put(RunDatabaseHelper.COLUMN_TITLE, set.getTitle());
+        database.update(RunDatabaseHelper.TABLE_RUNS, values, RunDatabaseHelper.COLUMN_ID + " = " + set.getId(), null);
+
+        // update existing rows
+        ContentValues segmentValues;
+        int dbSegmentCount = getDbSegmentCount(database, set.getId());
+
+        //delete excess rows
+        if (set.getCount() < dbSegmentCount) {
+            database.delete(RunDatabaseHelper.TABLE_SEGMENTS, RunDatabaseHelper.COLUMN_RUN_ID + " = " + set.getId() + " AND " + RunDatabaseHelper.COLUMN_INDEX + " >= " + set.getCount(), null);
+            dbSegmentCount = set.getCount();
+        }
+
+        for (int i = 0; i < dbSegmentCount; i++) {
+            segmentValues = new ContentValues();
+            segmentValues.put(RunDatabaseHelper.COLUMN_RUN_ID, set.getId());
+            segmentValues.put(RunDatabaseHelper.COLUMN_SEGMENT_NAME, set.getName(i));
+            segmentValues.put(RunDatabaseHelper.COLUMN_PB_TIME, set.getPbTime(i));
+            segmentValues.put(RunDatabaseHelper.COLUMN_BEST_SEG, set.getBestTime(i));
+            segmentValues.put(RunDatabaseHelper.COLUMN_INDEX, i);
+            database.update(RunDatabaseHelper.TABLE_SEGMENTS, segmentValues,
+                    RunDatabaseHelper.COLUMN_RUN_ID + " = " + set.getId() + " AND " + RunDatabaseHelper.COLUMN_INDEX + " = " + i, null);
+        }
+
+        // add new rows
+        if (set.getCount() > dbSegmentCount) {
+            for (int i = dbSegmentCount; i < set.getCount(); i++) {
+                segmentValues = new ContentValues();
+                segmentValues.put(RunDatabaseHelper.COLUMN_RUN_ID, set.getId());
+                segmentValues.put(RunDatabaseHelper.COLUMN_SEGMENT_NAME, set.getName(i));
+                segmentValues.put(RunDatabaseHelper.COLUMN_PB_TIME, set.getPbTime(i));
+                segmentValues.put(RunDatabaseHelper.COLUMN_BEST_SEG, set.getBestTime(i));
+                segmentValues.put(RunDatabaseHelper.COLUMN_INDEX, i);
+                database.insert(RunDatabaseHelper.TABLE_SEGMENTS, null, segmentValues);
+            }
+        }
+
+        //delete excess rows
+        database.delete(RunDatabaseHelper.TABLE_SEGMENTS, RunDatabaseHelper.COLUMN_RUN_ID + " = " + set.getId() + " AND " + RunDatabaseHelper.COLUMN_INDEX + " >= " + set.getCount(), null);
         close();
+    }
+
+    private int getDbSegmentCount(SQLiteDatabase database, long id) {
+        String Query = "Select * from " + RunDatabaseHelper.TABLE_SEGMENTS + " where " + RunDatabaseHelper.COLUMN_RUN_ID + " = " + id;
+        Cursor cursor = database.rawQuery(Query, null);
+        int num = cursor.getCount();
+        cursor.close();
+        return num;
     }
 
     public Observable<ArrayList<Run>> getRuns() {
