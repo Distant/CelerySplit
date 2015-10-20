@@ -19,6 +19,9 @@ public class ContainerPanel extends ViewPager implements Container<ContainerView
     private PageChangeListener listener;
 
     private boolean enabled = true;
+    public void setSwipeEnabled(boolean b){
+        enabled = b;
+    }
 
     private ArrayList<ContainerView> views;
     private int currentPosition = 0;
