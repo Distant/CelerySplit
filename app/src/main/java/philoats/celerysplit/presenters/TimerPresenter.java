@@ -16,7 +16,6 @@ import philoats.celerysplit.models.SplitSet;
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
-public class TimerPresenter implements Presenter {
 public class TimerPresenter implements Presenter, SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String TIMER_DEFAULT = "0.00";
@@ -96,22 +95,22 @@ public class TimerPresenter implements Presenter, SharedPreferences.OnSharedPref
 
     public void setLoadedSplits(SplitSet splits) {
         this.loadedSplits = splits;
-        resetDisplayTimes();
+        resetDisplayTimes(splits);
         this.reset();
         setTimerState(TimerEvent.RESET);
         splitsLoaded.onNext(true);
     }
 
-    private void resetDisplayTimes() {
-        displayTimes = Arrays.copyOf(loadedSplits.getPbTimes(), loadedSplits.getCount());
+    private void resetDisplayTimes(SplitSet splits) {
+        displayTimes = Arrays.copyOf(splits.getPbTimes(), splits.getCount());
         timeStrings = new String[displayTimes.length];
         bestTimeStrings = new String[displayTimes.length];
         for (int i = 0; i < displayTimes.length; i++) {
             timeStrings[i] = displayTimes[i] < 0 ? "-" : toTimeString(displayTimes[i]);
         }
 
-        for (int i = 0; i < loadedSplits.getCount(); i++){
-            bestTimeStrings[i] = toTimeString(loadedSplits.bestSegmentsCum[i]);
+        for (int i = 0; i < splits.getCount(); i++) {
+            bestTimeStrings[i] = toTimeString(splits.bestSegmentsCum[i]);
         }
 
         types.clear();
@@ -145,7 +144,7 @@ public class TimerPresenter implements Presenter, SharedPreferences.OnSharedPref
         startTime = System.currentTimeMillis();
         timerString.onNext(TIMER_DEFAULT);
         pauseTime = 0;
-        resetDisplayTimes();
+        resetDisplayTimes(loadedSplits);
         graphData.clear();
         loadedSplits.clearTemp();
         curSplit = 0;
@@ -205,7 +204,7 @@ public class TimerPresenter implements Presenter, SharedPreferences.OnSharedPref
         loadedSplits.tempPB[curSplit] = loadedSplits.getPbTimes()[curSplit];
         displayTimes[curSplit] = loadedSplits.getPbTimes()[curSplit];
         timeStrings[curSplit] = displayTimes[curSplit] < 0 ? "-" : toTimeString(displayTimes[curSplit]);
-        types.remove(types.size()-1);
+        types.remove(types.size() - 1);
         float pbTime = loadedSplits.getPbTimes()[curSplit];
         if (pbTime > 0) graphData.remove(graphData.size() - 1);
     }
@@ -285,9 +284,22 @@ public class TimerPresenter implements Presenter, SharedPreferences.OnSharedPref
         return loadedSplits.getNames();
     }
 
-    public CompareType getCompareType(){
+    public CompareType getCompareType() {
         return compareType;
     }
+
+    public String getName(int i) {
+        return loadedSplits.getName(i);
+    }
+
+    public String getPbTime(int i) {
+        return toTimeString(loadedSplits.getPbTime(i), false);
+    }
+
+    public int getCount() {
+        return loadedSplits.getCount();
+    }
+
     public void getPrefs(SharedPreferences sharedPreferences){
         showGraphSubject.onNext(sharedPreferences.getBoolean("showGraph", false));
         showLastSplitSubject.onNext(sharedPreferences.getBoolean("showLastSplit", false));
