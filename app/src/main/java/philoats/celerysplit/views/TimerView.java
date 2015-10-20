@@ -2,10 +2,13 @@ package philoats.celerysplit.views;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -29,8 +32,9 @@ import philoats.celerysplit.presenters.TimerPresenter;
 import rx.Subscription;
 import rx.android.view.ViewObservable;
 
+public class TimerView extends RelativeLayout implements ContainerView {
 
-    private static final int listOffset = 2;
+    private static final int listOffset = 3;
 
     private String START_TEXT;
     private String RESET_TEXT;
@@ -49,6 +53,7 @@ import rx.android.view.ViewObservable;
 
     private ListView list;
     private View listBottom;
+    private DualListItem lastSplit;
     private TimerListAdapter listAdapter;
     private BestTimerAdapter listBestAdapter;
 
@@ -70,6 +75,7 @@ import rx.android.view.ViewObservable;
 
     public void initialise(TimerPresenter presenter) {
         this.timerPresenter = presenter;
+        timerPresenter.getPrefs(getContext().getSharedPreferences("timerPreferences", Context.MODE_PRIVATE));
 
         // BUTTONS
         timerUnsplitButton = (Button) findViewById(R.id.timerUnsplitButton);
@@ -95,6 +101,35 @@ import rx.android.view.ViewObservable;
             String text = input == 0 ? "0.0" : Float.toString(toTenths(-1 * input));
             text = (-1 * input > 0 ? "+ " : "") + text;
             return text;
+        }).setGraphBackgroundColor(getResources().getColor(R.color.midnight_grey));
+
+        timerPresenter.showGraph().subscribe(show -> {
+            graph.setVisibility(show ? VISIBLE : GONE);
+            invalidate();
+        });
+
+        lastSplit = (DualListItem) findViewById(R.id.lastSplit);
+        timerPresenter.showLastSplitObservable().subscribe(show -> {
+            if (show) {
+                updateLastSplit();
+            } else {
+                lastSplit.setVisibility(GONE);
+                listBottom.setVisibility(GONE);
+            }
+            invalidate();
+        });
+
+        list.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (timerPresenter.showLastSplit()) {
+                    updateLastSplit();
+                }
+            }
         });
 
         subscriptionList.add(timerPresenter.onTimerStateChange().subscribe(timerEvent -> {
@@ -185,6 +220,8 @@ import rx.android.view.ViewObservable;
     }
 
     @Override
+    public void onAttachedToWindow() {
+        getContext().getSharedPreferences("timerPreferences", Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(timerPresenter);
         super.onAttachedToWindow();
     }
 
@@ -193,6 +230,7 @@ import rx.android.view.ViewObservable;
         for (Subscription sub : subscriptionList) {
             sub.unsubscribe();
         }
+        getContext().getSharedPreferences("timerPreferences", Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(timerPresenter);
         super.onDetachedFromWindow();
     }
 
@@ -225,7 +263,6 @@ import rx.android.view.ViewObservable;
     public void loadSplits() {
         setAdapter();
         list.setVisibility(VISIBLE);
-        listBottom.setVisibility(VISIBLE);
         toolbar.setTitle(timerPresenter.loadedSplits.getTitle());
         resizeToFit();
     }
@@ -237,7 +274,7 @@ import rx.android.view.ViewObservable;
         setAdapter();
         position = 0;
         list.setSelection(position);
-        ((ArrayAdapter<String>)list.getAdapter()).notifyDataSetChanged();
+        ((ArrayAdapter<String>) list.getAdapter()).notifyDataSetChanged();
 
         timerUnsplitButton.setEnabled(false);
         timerSplit.setEnabled(false);
@@ -264,7 +301,7 @@ import rx.android.view.ViewObservable;
         list.setSelection(position);
     }
 
-    public void pause(){
+    public void pause() {
         timerStartButton.setText(START_TEXT);
         timerSplit.setEnabled(false);
         timerUnsplitButton.setEnabled(false);
@@ -274,6 +311,11 @@ import rx.android.view.ViewObservable;
         listAdapter = new TimerListAdapter(getContext(), timerPresenter.getNames(), timerPresenter.getTimeStrings(), timerPresenter.getTypes());
         listBestAdapter = new BestTimerAdapter(getContext(), timerPresenter.getNames(), timerPresenter.getBestTimeStrings(), timerPresenter.getTypes());
         list.setAdapter(timerPresenter.getCompareType() == CompareType.PBTIMES ? listAdapter : listBestAdapter);
+        lastSplit.getTextLeft().setText(timerPresenter.getName(timerPresenter.getCount() - 1));
+        lastSplit.getTextLeft().setTextColor(getContext().getResources().getColor(R.color.split_inactive_text));
+        lastSplit.getTextRight().setText(timerPresenter.getPbTime(timerPresenter.getCount() - 1));
+        lastSplit.getTextRight().setTextColor(getContext().getResources().getColor(R.color.split_inactive_text));
+        lastSplit.setBackgroundColor(getResources().getColor(R.color.midnight_grey));
     }
 
     public void setTitle(String title) {
@@ -285,7 +327,7 @@ import rx.android.view.ViewObservable;
     }
 
     public void updateSplits(boolean split) {
-        ((ArrayAdapter<String>)list.getAdapter()).notifyDataSetChanged();
+        ((ArrayAdapter<String>) list.getAdapter()).notifyDataSetChanged();
         if (split) split();
         else unsplit();
         graph.notifyDataSetChanged();
@@ -294,6 +336,11 @@ import rx.android.view.ViewObservable;
 
     public void split() {
         int size = list.getLastVisiblePosition() - list.getFirstVisiblePosition() + 1;
+        if (list.getLastVisiblePosition() >= timerPresenter.getCount() - 2) {
+            System.out.println("last visible");
+            list.setSelection(timerPresenter.getCount() - 1);
+            return;
+        }
         if (timerPresenter.getCurSplit() > position + size - 1 - listOffset)
             list.setSelection(position == (list.getCount() - size + 1) ? position : (position += 1));
     }
@@ -301,6 +348,20 @@ import rx.android.view.ViewObservable;
     public void unsplit() {
         if (timerPresenter.getCurSplit() < position + listOffset - 1)
             list.setSelection(position == 0 ? position : (position -= 1));
+    }
+
+    private void updateLastSplit() {
+        if (lastSplit.getVisibility() == VISIBLE) {
+            if (list.getLastVisiblePosition() == timerPresenter.getCount() - 1) {
+                lastSplit.setVisibility(INVISIBLE);
+                listBottom.setVisibility(INVISIBLE);
+            }
+        } else {
+            if (list.getLastVisiblePosition() < timerPresenter.getCount() - 1) {
+                lastSplit.setVisibility(VISIBLE);
+                listBottom.setVisibility(VISIBLE);
+            }
+        }
     }
 
     public void alertForSave() {
