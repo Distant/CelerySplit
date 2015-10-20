@@ -2,7 +2,6 @@ package philoats.celerysplit.views;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -30,7 +29,6 @@ import philoats.celerysplit.presenters.TimerPresenter;
 import rx.Subscription;
 import rx.android.view.ViewObservable;
 
-public class TimerView extends RelativeLayout implements ContainerView, SharedPreferences.OnSharedPreferenceChangeListener{
 
     private static final int listOffset = 2;
 
@@ -184,12 +182,9 @@ public class TimerView extends RelativeLayout implements ContainerView, SharedPr
 
             }
         });
-        updatePrefs(getContext().getSharedPreferences("timerPreferences", Context.MODE_PRIVATE));
     }
 
     @Override
-    public void onAttachedToWindow(){
-        getContext().getSharedPreferences("timerPreferences", Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(this);
         super.onAttachedToWindow();
     }
 
@@ -198,7 +193,6 @@ public class TimerView extends RelativeLayout implements ContainerView, SharedPr
         for (Subscription sub : subscriptionList) {
             sub.unsubscribe();
         }
-        getContext().getSharedPreferences("timerPreferences", Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(this);
         super.onDetachedFromWindow();
     }
 
@@ -326,15 +320,5 @@ public class TimerView extends RelativeLayout implements ContainerView, SharedPr
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
-    }
-
-    private void updatePrefs(SharedPreferences sharedPreferences) {
-        graph.setVisibility(sharedPreferences.getBoolean("showGraph", false)? VISIBLE : GONE);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        updatePrefs(sharedPreferences);
-        invalidate();
     }
 }

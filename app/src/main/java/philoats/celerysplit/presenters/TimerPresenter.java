@@ -1,6 +1,8 @@
 package philoats.celerysplit.presenters;
 
+import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
 public class TimerPresenter implements Presenter {
+public class TimerPresenter implements Presenter, SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String TIMER_DEFAULT = "0.00";
 
@@ -36,6 +39,22 @@ public class TimerPresenter implements Presenter {
 
     public Observable<Boolean> onSplitsLoaded() {
         return splitsLoaded;
+    }
+
+    private BehaviorSubject<Boolean> showGraphSubject = BehaviorSubject.create();
+
+    public Observable<Boolean> showGraph() {
+        return showGraphSubject;
+    }
+
+    private BehaviorSubject<Boolean> showLastSplitSubject = BehaviorSubject.create();
+
+    public Observable<Boolean> showLastSplitObservable() {
+        return showLastSplitSubject;
+    }
+
+    public boolean showLastSplit() {
+        return showLastSplitSubject.getValue();
     }
 
     private long pauseTime;
@@ -268,5 +287,17 @@ public class TimerPresenter implements Presenter {
 
     public CompareType getCompareType(){
         return compareType;
+    }
+    public void getPrefs(SharedPreferences sharedPreferences){
+        showGraphSubject.onNext(sharedPreferences.getBoolean("showGraph", false));
+        showLastSplitSubject.onNext(sharedPreferences.getBoolean("showLastSplit", false));
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("showGraph"))
+            showGraphSubject.onNext(sharedPreferences.getBoolean("showGraph", false));
+        else if (key.equals("showLastSplit"))
+            showLastSplitSubject.onNext(sharedPreferences.getBoolean("showLastSplit", false));
     }
 }
