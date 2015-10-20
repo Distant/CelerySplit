@@ -11,7 +11,6 @@ import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 
 public class SettingsView extends RelativeLayout implements ContainerView{
-    private SettingsPresenter presenter;
 
     public SettingsView(Context context) {
         super(context);
@@ -26,13 +25,16 @@ public class SettingsView extends RelativeLayout implements ContainerView{
     }
 
     public void initialise(SettingsPresenter presenter){
-        this.presenter = presenter;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("SETTINGS");
 
         CheckBox graphCheck = (CheckBox) findViewById(R.id.graph_check);
         graphCheck.setChecked(getContext().getSharedPreferences("timerPreferences", Context.MODE_PRIVATE).getBoolean("showGraph", false));
         graphCheck.setOnCheckedChangeListener((buttonView, isChecked) -> presenter.graphCheck(isChecked));
+
+        CheckBox lastSplitCheck = (CheckBox) findViewById(R.id.last_split_check);
+        lastSplitCheck.setChecked(getContext().getSharedPreferences("timerPreferences", Context.MODE_PRIVATE).getBoolean("showLastSplit", false));
+        lastSplitCheck.setOnCheckedChangeListener((buttonView, isChecked) -> presenter.lastSplitCheck(isChecked));
     }
 
     @Override
