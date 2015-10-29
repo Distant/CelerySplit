@@ -1,11 +1,9 @@
 package philoats.celerysplit.adapters;
 
-import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -14,90 +12,72 @@ import java.util.ArrayList;
 import philoats.celerysplit.R;
 import philoats.celerysplit.models.Run;
 import philoats.celerysplit.views.LongPressItem;
+import rx.functions.Action1;
 
-public class RunListAdapter extends ArrayAdapter<Run> {
+public class RunListAdapter extends RecyclerView.Adapter<RunListAdapter.RunViewHolder> {
 
-    private Context context;
-    private int resource;
     private ArrayList<Run> runs;
-    private ListView list;
-    private ButtonListener listener;
+    private RunListAdapter.ButtonListener listener;
+    private Action1<Integer> itemClickAction;
 
-    public RunListAdapter(Context context, int resource, ArrayList<Run> runs, ListView list, ButtonListener listener) {
-        super(context, resource);
-        this.context = context;
-        this.resource = resource;
+    public RunListAdapter(ArrayList<Run> runs, ButtonListener listener, Action1<Integer> onItemClick) {
         this.runs = runs;
-        this.list = list;
         this.listener = listener;
+        this.itemClickAction = onItemClick;
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
-        View view;
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(resource, parent, false);
-            holder = new ViewHolder(view);
-            view.setTag(holder);
-        } else {
-            view = convertView;
-            holder = (ViewHolder) view.getTag();
-        }
-
-        view.clearFocus();
-        holder.name.setText(runs.get(position).toString());
-
-        holder.delete.setOnClickListener(v -> listener.onDeleteButtonPressed(runs.get(position)));
-        holder.delete.setClickable(false);
-
-        holder.edit.setOnClickListener(v -> {
-            listener.onEditButtonPressed(runs.get(position));
-            LongPressItem.getSelected().deselect();
-        });
-        holder.edit.setClickable(false);
-
-        RelativeLayout layout = (RelativeLayout) view.findViewById(R.id.relLayout);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) layout.getLayoutParams();
-        params.rightMargin = 0;
-        params.leftMargin = 0;
-        layout.setLayoutParams(params);
-
-        ((LongPressItem) view).setList(list);
-        return view;
+    public RunViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_layered, parent, false);
+        return new RunViewHolder(v, itemClickAction);
     }
 
     @Override
-    public int getCount() {
+    public int getItemCount() {
         return runs.size();
     }
 
     @Override
-    public Run getItem(int pos) {
-        return runs.get(pos);
+    public void onBindViewHolder(RunViewHolder holder, int position) {
+        holder.name.setText(runs.get(position).toString());
+        holder.delete.setOnClickListener(v -> listener.onDeleteButtonPressed(position));
+        holder.edit.setOnClickListener(v -> {
+            listener.onEditButtonPressed(position);
+            LongPressItem.getSelected().deselect();
+        });
     }
 
-    public interface ButtonListener {
-        public void onEditButtonPressed(Run run);
+    public class RunViewHolder extends RecyclerView.ViewHolder {
 
-        public void onDeleteButtonPressed(Run run);
-    }
-
-    @Override
-    public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
-    }
-
-    private static class ViewHolder {
+        public Action1<Integer> action;
         public TextView name;
         public TextView delete;
         public TextView edit;
 
-        public ViewHolder(View view) {
-            name = (TextView) view.findViewById(R.id.textLeft);
-            delete = (TextView) view.findViewById(R.id.deleteButton);
-            edit = (TextView) view.findViewById(R.id.editButton);
+        public RunViewHolder(View itemView, Action1<Integer> action) {
+            super(itemView);
+            name = (TextView) itemView.findViewById(R.id.textLeft);
+            delete = (TextView) itemView.findViewById(R.id.deleteButton);
+            delete.setClickable(false);
+            edit = (TextView) itemView.findViewById(R.id.editButton);
+            edit.setClickable(false);
+
+            this.action = action;
+            itemView.setOnClickListener(v -> action.call(getAdapterPosition()));
+
+            RelativeLayout layout = (RelativeLayout) itemView.findViewById(R.id.relLayout);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) layout.getLayoutParams();
+            params.rightMargin = 0;
+            params.leftMargin = 0;
+            layout.setLayoutParams(params);
+
+            ((LongPressItem) itemView).init();
         }
+    }
+
+    public interface ButtonListener {
+        void onEditButtonPressed(int i);
+
+        void onDeleteButtonPressed(int i);
     }
 }

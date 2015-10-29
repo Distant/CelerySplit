@@ -4,15 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -20,17 +19,15 @@ import java.util.ArrayList;
 import philoats.celerysplit.R;
 import philoats.celerysplit.activities.ContainerPanel;
 import philoats.celerysplit.activities.MainActivity;
-import philoats.celerysplit.adapters.LayeredListAdapter;
+import philoats.celerysplit.adapters.RunListAdapter;
 import philoats.celerysplit.models.Run;
-import philoats.celerysplit.models.SplitSet;
 import philoats.celerysplit.presenters.EditRunPresenter;
 import philoats.celerysplit.presenters.RunListPresenter;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class RunListView extends CoordinatorLayout implements ContainerView, AdapterView.OnItemClickListener, LayeredListAdapter.ButtonListener {
+public class RunListView extends CoordinatorLayout implements ContainerView, RunListAdapter.ButtonListener {
 
-    private ArrayAdapter<Run> listAdapter;
     private RunListPresenter runListPresenter;
     private ArrayList<Run> runs;
 
@@ -51,18 +48,16 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Ada
     public void initialise(RunListPresenter presenter) {
         this.runListPresenter = presenter;
         this.runs = new ArrayList<>();
-        ListView listView = (ListView) findViewById(android.R.id.list);
-        this.listAdapter = new LayeredListAdapter(getContext(), runs, listView, this);
-        listView.setAdapter(listAdapter);
-        listView.setOnItemClickListener(this);
+        RecyclerView listView = (RecyclerView) findViewById(android.R.id.list);
+        listView.setLayoutManager(new LinearLayoutManager(getContext()));
+        listView.setAdapter(new RunListAdapter(runs, this, i -> runListPresenter.onItemClick(runs.get(i))));
 
         this.runListPresenter.runObservable().subscribeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(newRuns -> {
                     runs.clear();
                     runs.addAll(newRuns);
-                    listAdapter.notifyDataSetChanged();
-                    System.out.println("runs loaded from database");
+                    listView.getAdapter().notifyDataSetChanged();
                 });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -142,11 +137,6 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Ada
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        runListPresenter.onItemClick(runs.get(position));
     }
 
     public void showEdit() {
