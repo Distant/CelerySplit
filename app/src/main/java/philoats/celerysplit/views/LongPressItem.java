@@ -7,7 +7,6 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -15,8 +14,12 @@ import philoats.celerysplit.R;
 
 public class LongPressItem extends RelativeLayout implements View.OnTouchListener {
 
+    public interface ButtonListener {
+        void onEditButtonPressed(int i);
+        void onDeleteButtonPressed(int i);
+    }
+
     private int maxWidth;
-    private ListView list;
     private RelativeLayout layout;
     private RelativeLayout.LayoutParams params;
     private boolean didMove = false;
@@ -41,11 +44,10 @@ public class LongPressItem extends RelativeLayout implements View.OnTouchListene
         super(context, attrs, defStyleAttr);
     }
 
-    public void setList(ListView list) {
+    public void init() {
         this.layout = (RelativeLayout) findViewById(R.id.relLayout);
         this.delete = (TextView) findViewById(R.id.deleteButton);
         this.edit = (TextView) findViewById(R.id.editButton);
-        this.list = list;
         state = NONE;
         params = (RelativeLayout.LayoutParams) layout.getLayoutParams();
         setOnTouchListener(this);
@@ -96,7 +98,7 @@ public class LongPressItem extends RelativeLayout implements View.OnTouchListene
             }
             case MotionEvent.ACTION_UP: {
                 layout.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.midnight_grey));
-                if (!didMove) list.performItemClick(v, list.getPositionForView(v), 0);
+                if (!didMove) this.performClick();
                 didMove = false;
                 return true;
             }
