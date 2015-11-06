@@ -103,7 +103,7 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Run
     public void onEditButtonPressed(int i) {
         editRunView.setSplits(runs.get(i))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(b -> showEdit());
+                .subscribe(set -> showEdit());
     }
 
     @Override
