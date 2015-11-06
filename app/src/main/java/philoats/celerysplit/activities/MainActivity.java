@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import java.io.File;
 
