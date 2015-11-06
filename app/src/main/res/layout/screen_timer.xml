@@ -55,10 +55,18 @@
         android:background="@drawable/gradient_top"
         android:id="@+id/toolbar_shadow"/>
 
+    <include layout="@layout/list_item_dual"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lastSplit"
+        android:layout_alignBottom="@id/splitList"
+        android:background="@color/toolbar"
+        />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="2px"
-        android:layout_alignBottom="@+id/splitList"
+        android:layout_alignTop="@+id/lastSplit"
         android:background="@color/tab_indicator"
         android:id="@+id/listBottom"
         android:visibility="invisible"/>
