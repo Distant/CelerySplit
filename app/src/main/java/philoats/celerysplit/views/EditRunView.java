@@ -121,11 +121,8 @@ public class EditRunView extends CoordinatorLayout implements LongPressItem.Butt
         showEditSplitDialog(presenter.getSet(), "", -1);
     }
 
-    public Observable<Boolean> setSplits(Run run) {
-        return Observable.create(subscriber -> presenter.setSet(run).subscribe(set -> {
-            subscriber.onNext(true);
-            subscriber.onCompleted();
-        }));
+    public Observable<SplitSet> setSplits(Run run) {
+        return presenter.setSet(run);
     }
 
     private void loadSplits(SplitSet set) {
