@@ -40,12 +40,10 @@ public class RunListPresenter implements Presenter, EditRunPresenter.EditListene
     @Override
     public void onFinishEdited() {
         dataAccess.getRuns().subscribe(runSubject::onNext);
-        //parent.transitionFromEdit();
     }
 
     @Override
     public void onCancel() {
-        //parent.transitionFromEdit();
     }
 
     public void onItemClick(Run run) {
