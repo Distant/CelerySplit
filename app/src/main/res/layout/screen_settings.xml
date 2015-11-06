@@ -1,30 +1,49 @@
 <philoats.celerysplit.views.SettingsView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="philoats.celerysplit.fragments.SettingsFragment">
 
     <android.support.v7.widget.Toolbar
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_gravity="center_horizontal|top"
         android:id="@+id/toolbar"
-        android:background="@color/toolbar"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
+        android:background="@color/toolbar" />
 
     <View
+        android:id="@+id/listBottom"
         android:layout_width="match_parent"
         android:layout_height="@dimen/drop_shadow_height"
         android:layout_below="@id/toolbar"
-        android:background="@drawable/gradient_top"
-        android:id="@+id/listBottom"/>
+        android:background="@drawable/gradient_top" />
 
-    <CheckBox
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/screen_settings_show_graph"
-        android:id="@+id/graph_check"
-        android:layout_gravity="center"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"/>
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true">
+
+        <CheckBox
+            android:id="@+id/graph_check"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="16dp"
+            android:text="@string/screen_settings_show_graph"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <CheckBox
+            android:id="@+id/last_split_check"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="16dp"
+            android:text="@string/screen_settings_show_last_split"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    </LinearLayout>
 
 </philoats.celerysplit.views.SettingsView>
