@@ -17,10 +17,10 @@ import rx.functions.Action1;
 public class RunListAdapter extends RecyclerView.Adapter<RunListAdapter.RunViewHolder> {
 
     private ArrayList<Run> runs;
-    private RunListAdapter.ButtonListener listener;
+    private LongPressItem.ButtonListener listener;
     private Action1<Integer> itemClickAction;
 
-    public RunListAdapter(ArrayList<Run> runs, ButtonListener listener, Action1<Integer> onItemClick) {
+    public RunListAdapter(ArrayList<Run> runs, LongPressItem.ButtonListener listener, Action1<Integer> onItemClick) {
         this.runs = runs;
         this.listener = listener;
         this.itemClickAction = onItemClick;
@@ -49,7 +49,6 @@ public class RunListAdapter extends RecyclerView.Adapter<RunListAdapter.RunViewH
 
     public class RunViewHolder extends RecyclerView.ViewHolder {
 
-        public Action1<Integer> action;
         public TextView name;
         public TextView delete;
         public TextView edit;
@@ -62,7 +61,6 @@ public class RunListAdapter extends RecyclerView.Adapter<RunListAdapter.RunViewH
             edit = (TextView) itemView.findViewById(R.id.editButton);
             edit.setClickable(false);
 
-            this.action = action;
             itemView.setOnClickListener(v -> action.call(getAdapterPosition()));
 
             RelativeLayout layout = (RelativeLayout) itemView.findViewById(R.id.relLayout);
@@ -73,11 +71,5 @@ public class RunListAdapter extends RecyclerView.Adapter<RunListAdapter.RunViewH
 
             ((LongPressItem) itemView).init();
         }
-    }
-
-    public interface ButtonListener {
-        void onEditButtonPressed(int i);
-
-        void onDeleteButtonPressed(int i);
     }
 }
