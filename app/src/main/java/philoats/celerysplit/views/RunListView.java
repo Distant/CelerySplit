@@ -26,7 +26,7 @@ import philoats.celerysplit.presenters.RunListPresenter;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class RunListView extends CoordinatorLayout implements ContainerView, RunListAdapter.ButtonListener {
+public class RunListView extends CoordinatorLayout implements ContainerView, LongPressItem.ButtonListener {
 
     private RunListPresenter runListPresenter;
     private ArrayList<Run> runs;
@@ -87,9 +87,6 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Run
             return false;
         });
 
-        FloatingActionButton newSplitButton = (FloatingActionButton) findViewById(R.id.fab_add);
-        newSplitButton.setOnClickListener(v -> editRunView.setSplits(null).subscribe(b -> showEdit()));
-
         ContainerPanel container = ((MainActivity) getContext()).getContainer();
         this.editRunView = (EditRunView) ((Activity) getContext()).getLayoutInflater().inflate(R.layout.subscreen_edit_split, container, false);
 
@@ -97,6 +94,9 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Run
         editRunPresenter.setListener(runListPresenter);
         editRunView.initialise(editRunPresenter);
         editRunView.setOnComplete(b -> hideEdit());
+
+        FloatingActionButton newSplitButton = (FloatingActionButton) findViewById(R.id.fab_add);
+        newSplitButton.setOnClickListener(v -> editRunView.setSplits(null).subscribe(set -> showEdit()));
     }
 
     @Override
