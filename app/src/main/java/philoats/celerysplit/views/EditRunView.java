@@ -4,29 +4,29 @@ import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import philoats.celerysplit.R;
 import philoats.celerysplit.adapters.EditArrayAdapter;
-import philoats.celerysplit.adapters.LayeredListAdapter;
 import philoats.celerysplit.models.Run;
 import philoats.celerysplit.models.SplitSet;
 import philoats.celerysplit.presenters.EditRunPresenter;
 import rx.Observable;
 import rx.functions.Action1;
 
-public class EditRunView extends CoordinatorLayout implements LayeredListAdapter.ButtonListener {
+public class EditRunView extends CoordinatorLayout implements LongPressItem.ButtonListener {
 
     private EditRunPresenter presenter;
     private TextView titleView;
     private Toolbar toolbar;
-    private ListView listView;
+    private RecyclerView listView;
     private EditArrayAdapter adapter;
 
     private Action1<Boolean> onComplete;
@@ -50,13 +50,13 @@ public class EditRunView extends CoordinatorLayout implements LayeredListAdapter
     public void initialise(EditRunPresenter presenter) {
         this.presenter = presenter;
 
-        listView = (ListView) findViewById(R.id.listView);
-        adapter = new EditArrayAdapter(getContext(), presenter.getSet(), listView, this);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            String text = adapter.getItem(position);
-            showEditSplitDialog(presenter.getSet(), text, position);
+        listView = (RecyclerView) findViewById(R.id.listView);
+        listView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new EditArrayAdapter(presenter.getSet(), this, i -> {
+            String text = presenter.getSet().getName(i);
+            showEditSplitDialog(presenter.getSet(), text, i);
         });
+        listView.setAdapter(adapter);
 
         FloatingActionButton plusButton = (FloatingActionButton) findViewById(R.id.fab_add);
         plusButton.setOnClickListener(v -> showEditSplitDialog());
@@ -137,7 +137,10 @@ public class EditRunView extends CoordinatorLayout implements LayeredListAdapter
             titleView.setText(title);
             toolbar.setTitle("Edit Splits");
         }
-        adapter = new EditArrayAdapter(getContext(), presenter.getSet(), listView, this);
+        adapter = new EditArrayAdapter(presenter.getSet(), this, i -> {
+            String text = presenter.getSet().getName(i);
+            showEditSplitDialog(presenter.getSet(), text, i);
+        });
         listView.setAdapter(adapter);
     }
 
@@ -147,13 +150,14 @@ public class EditRunView extends CoordinatorLayout implements LayeredListAdapter
 
     @Override
     public void onEditButtonPressed(int i) {
-        String text = adapter.getItem(i);
+        String text = presenter.getSet().getName(i);
         showEditSplitDialog(presenter.getSet(), text, i);
     }
 
     @Override
     public void onDeleteButtonPressed(int i) {
         presenter.getSet().deleteSegment(i);
-        adapter.notifyDataSetChanged();
+        adapter.notifyItemRemoved(i);
+        adapter.notifyItemRangeChanged(i, presenter.getSet().getCount());
     }
 }
