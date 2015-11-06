@@ -1,58 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<philoats.celerysplit.views.LongPressItem
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:descendantFocusability="blocksDescendants"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:background="@color/midnight_grey">
 
     <RelativeLayout
-        android:id="@+id/relLayout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:id="@+id/relLayout2"
+        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@+id/relLayout"
+        android:background="@color/toolbar"
+        android:gravity="center_vertical">
 
         <TextView
-            android:id="@+id/textLeft"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:gravity="left|center_vertical"
-            android:minHeight="?android:attr/listPreferredItemHeightSmall"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:text="@string/dual_item_left_default"
-            android:textAppearance="?android:attr/textAppearanceListItem"
-            android:textSize="18sp" />
+            android:text="@string/layered_item_edit"
+            android:id="@+id/editButton"
+            android:layout_width="70dp"
+            android:layout_height="fill_parent"
+            android:paddingRight="5dp"
+            android:paddingLeft="5dp"
+            android:textSize="15sp"
+            android:gravity="center|center_vertical"
+            android:layout_toLeftOf="@+id/deleteButton"
+            android:textColor="@color/pastel_green"
+            android:background="@color/toolbar"
+            android:minHeight="?android:attr/listPreferredItemHeightSmall"/>
 
         <TextView
-            android:id="@+id/titleViewEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignBaseline="@id/textLeft"
-            android:layout_margin="4dp"
-            android:layout_toRightOf="@+id/textLeft"
-            android:text="@string/edit"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="14sp"
-            android:gravity="center_vertical|center"/>
-
-        <TextView
-            android:id="@+id/textRight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+            android:text="@string/layered_item_delete"
+            android:id="@+id/deleteButton"
+            android:layout_width="70dp"
+            android:layout_height="fill_parent"
+            android:paddingRight="5dp"
+            android:paddingLeft="5dp"
+            android:textSize="15sp"
+            android:gravity="center|center_vertical"
             android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:gravity="right|center_vertical"
-            android:minHeight="?android:attr/listPreferredItemHeightSmall"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:text="@string/dual_item_right_default"
-            android:textAppearance="?android:attr/textAppearanceListItem"
-            android:textSize="18sp" />
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/pastel_red"
+            android:background="@color/toolbar"
+            android:minHeight="?android:attr/listPreferredItemHeightSmall"/>
 
     </RelativeLayout>
-</RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/relLayout"
+        android:background="@color/midnight_grey">
+
+        <TextView
+            android:text="@string/layered_item_left_default"
+            android:id="@+id/textLeft"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="16dp"
+            android:paddingLeft="16dp"
+            android:textAppearance="?android:attr/textAppearanceListItem"
+            android:textSize="18sp"
+            android:gravity="left|center_vertical"
+            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:text="@string/dual_item_right_default"
+            android:id="@+id/textRight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingRight="16dp"
+            android:paddingLeft="16dp"
+            android:textAppearance="?android:attr/textAppearanceListItem"
+            android:textSize="18sp"
+            android:gravity="right|center_vertical"
+            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
+</philoats.celerysplit.views.LongPressItem>
