@@ -54,10 +54,15 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Lon
 
         this.runListPresenter.runObservable().subscribeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(newRuns -> {
+                .subscribe(runsEvent -> {
                     runs.clear();
-                    runs.addAll(newRuns);
-                    listView.getAdapter().notifyDataSetChanged();
+                    runs.addAll(runsEvent.getRuns());
+                    if (runsEvent.getEventType() == RunDataEvent.DELETED) {
+                        listView.getAdapter().notifyItemRemoved(runsEvent.getIndex());
+                        listView.getAdapter().notifyItemRangeChanged(runsEvent.getIndex(), runsEvent.getRuns().size());
+                    } else {
+                        listView.getAdapter().notifyDataSetChanged();
+                    }
                 });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
