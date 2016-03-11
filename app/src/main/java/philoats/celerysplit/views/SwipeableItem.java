@@ -2,7 +2,10 @@ package philoats.celerysplit.views;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
@@ -28,6 +31,13 @@ public class SwipeableItem extends RelativeLayout implements View.OnTouchListene
     private static final int RL = 1;
     private static final int LR = 2;
 
+    final Handler handler = new Handler();
+    Runnable longPressed = () -> {
+        System.out.println("Long press! handler");
+        didMove = true;
+    };
+
+
     public SwipeableItem(Context context) {
         super(context);
     }
@@ -40,8 +50,7 @@ public class SwipeableItem extends RelativeLayout implements View.OnTouchListene
         super(context, attrs, defStyleAttr);
     }
 
-    public void setSwipeable(ListView list)
-    {
+    public void setSwipeable(ListView list) {
         this.layout = (RelativeLayout) findViewById(R.id.relLayout);
         this.delete = (TextView) findViewById(R.id.deleteButton);
         this.edit = (TextView) findViewById(R.id.editButton);
@@ -50,20 +59,17 @@ public class SwipeableItem extends RelativeLayout implements View.OnTouchListene
         setOnTouchListener(this);
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event)
-    {
-        switch (event.getAction())
-        {
-            case MotionEvent.ACTION_DOWN:
-            {
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                handler.postDelayed(longPressed, 1000);
+
                 if (selected != this && selected != null) {
                     selected.deselect();
                 }
                 selected = this;
                 maxWidth = delete.getWidth() + edit.getWidth();
-                if (state == RL)
-                {
+                if (state == RL) {
                     doAnim(0);
                     didMove = true;
                     state = NONE;
@@ -73,8 +79,8 @@ public class SwipeableItem extends RelativeLayout implements View.OnTouchListene
                 x = event.getX();
                 return true;
             }
-            case MotionEvent.ACTION_MOVE:
-            {
+            case MotionEvent.ACTION_MOVE: {
+                handler.removeCallbacks(longPressed);
                 list.requestDisallowInterceptTouchEvent(true);
                 int dx = (int) (x - event.getX());
                 if (dx < 0) {
@@ -82,7 +88,7 @@ public class SwipeableItem extends RelativeLayout implements View.OnTouchListene
                     dx = 0;
                 }
                 if (dx > 20) didMove = true;
-                if (dx > ( maxWidth)/2) {
+                if (dx > (maxWidth) / 2) {
                     state = RL;
                     if (dx >= maxWidth) {
                         x -= dx - maxWidth;
@@ -92,25 +98,21 @@ public class SwipeableItem extends RelativeLayout implements View.OnTouchListene
                 swipe(dx);
                 return true;
             }
-            case MotionEvent.ACTION_UP:
-            {
+            case MotionEvent.ACTION_UP: {
                 params = (RelativeLayout.LayoutParams) layout.getLayoutParams();
                 int target;
-                if (state == RL)
-                {
+                if (state == RL) {
                     target = maxWidth;
                     delete.setClickable(true);
                     edit.setClickable(true);
-                }
-                else target = 0;
+                } else target = 0;
                 doAnim(target);
                 list.requestDisallowInterceptTouchEvent(false);
                 if (!didMove) list.performItemClick(v, list.getPositionForView(v), 0);
                 didMove = false;
                 return true;
             }
-            case MotionEvent.ACTION_CANCEL:
-            {
+            case MotionEvent.ACTION_CANCEL: {
                 return false;
             }
         }
@@ -123,11 +125,8 @@ public class SwipeableItem extends RelativeLayout implements View.OnTouchListene
         edit.setClickable(false);
         try {
             doAnim(0);
-        }
-        catch (NullPointerException ex) {
-            // error here once couldn't replicate :(
+        } catch (NullPointerException ex) {
             ex.printStackTrace();
-            System.out.println("MASSIVE ERROR PROBABLY COULDN'T FIND MARGIN AGAIN - SOMETHING TO DO WITH THE SLIDEY BIT");
         }
     }
 
@@ -145,21 +144,18 @@ public class SwipeableItem extends RelativeLayout implements View.OnTouchListene
         animator.start();
     }
 
-    public void swipe(int dx)
-    {
+    public void swipe(int dx) {
         params = (RelativeLayout.LayoutParams) layout.getLayoutParams();
         params.rightMargin = dx;
         params.leftMargin = -dx;
         layout.setLayoutParams(params);
     }
 
-    public int getState()
-    {
+    public int getState() {
         return state;
     }
 
-    public static SwipeableItem getSelected()
-    {
+    public static SwipeableItem getSelected() {
         return selected;
     }
 
