@@ -10,6 +10,7 @@ import philoats.celerysplit.models.SplitSet;
 
 import rx.functions.Action1;
 import rx.Observable;
+import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 
 public class RunListPresenter implements Presenter, EditRunPresenter.EditListener {
@@ -29,8 +30,8 @@ public class RunListPresenter implements Presenter, EditRunPresenter.EditListene
         dataAccess = new RunDataAccess(context);
     }
 
-    public void refresh(){
-        dataAccess.getRuns().subscribe(runSubject::onNext);
+    public void refresh() {
+        dataAccess.getRuns().subscribe(runs -> runSubject.onNext(new RunDataEvent(runs)));
     }
 
     public void onDetach(){
@@ -39,7 +40,7 @@ public class RunListPresenter implements Presenter, EditRunPresenter.EditListene
 
     @Override
     public void onFinishEdited() {
-        dataAccess.getRuns().subscribe(runSubject::onNext);
+        dataAccess.getRuns().subscribe(runs -> runSubject.onNext(new RunDataEvent(runs)));
     }
 
     @Override
@@ -53,9 +54,9 @@ public class RunListPresenter implements Presenter, EditRunPresenter.EditListene
         }
     }
 
-    public void onDelete(Run run) {
-        dataAccess.deleteRun(run.get_id());
-        dataAccess.getRuns().subscribe(runSubject::onNext);
+    public void onDelete(int index) {
+        dataAccess.deleteRun(runSubject.getValue().getRuns().get(index).get_id());
+        dataAccess.getRuns().subscribe(runs -> runSubject.onNext(new RunDataEvent(index, RunDataEvent.DELETED, runs)));
     }
 
     public void exportFile(Context context, Run run){
