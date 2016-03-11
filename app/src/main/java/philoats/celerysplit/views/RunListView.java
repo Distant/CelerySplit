@@ -22,6 +22,7 @@ import philoats.celerysplit.activities.MainActivity;
 import philoats.celerysplit.adapters.RunListAdapter;
 import philoats.celerysplit.models.Run;
 import philoats.celerysplit.presenters.EditRunPresenter;
+import philoats.celerysplit.presenters.RunDataEvent;
 import philoats.celerysplit.presenters.RunListPresenter;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
