@@ -115,7 +115,7 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Lon
 
     @Override
     public void onDeleteButtonPressed(int i) {
-        runListPresenter.onDelete(runs.get(i));
+        runListPresenter.onDelete(i);
     }
 
     @Override
