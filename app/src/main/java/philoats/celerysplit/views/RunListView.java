@@ -33,6 +33,7 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Lon
     private ArrayList<Run> runs;
 
     private EditRunView editRunView;
+    FloatingActionButton plusButton;
 
     public RunListView(Context context) {
         super(context);
@@ -101,8 +102,8 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Lon
         editRunView.initialise(editRunPresenter);
         editRunView.setOnComplete(b -> hideEdit());
 
-        FloatingActionButton newSplitButton = (FloatingActionButton) findViewById(R.id.fab_add);
-        newSplitButton.setOnClickListener(v -> editRunView.setSplits(null).subscribe(set -> showEdit()));
+        plusButton = (FloatingActionButton) findViewById(R.id.fab_add);
+        plusButton.setOnClickListener(v -> editRunView.setSplits(null).subscribe(set -> showEdit()));
     }
 
     @Override
@@ -147,6 +148,7 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Lon
 
     public void showEdit() {
         LinearLayout editContainer = (LinearLayout) findViewById(R.id.editContainer);
+        plusButton.setVisibility(INVISIBLE);
         editContainer.addView(editRunView);
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.enter);
         editRunView.startAnimation(animation);
@@ -158,6 +160,7 @@ public class RunListView extends CoordinatorLayout implements ContainerView, Lon
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.exit);
         editRunView.startAnimation(animation);
         editContainer.removeView(editRunView);
+        plusButton.setVisibility(VISIBLE);
         editContainer.setClickable(false);
     }
 }
