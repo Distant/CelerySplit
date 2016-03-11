@@ -39,7 +39,7 @@ public class EditArrayAdapter extends RecyclerView.Adapter<EditArrayAdapter.Spli
     @Override
     public void onBindViewHolder(SplitViewHolder holder, int position) {
 
-        LongPressItem.getSelected().deselect();
+        LongPressItem.reset();
         holder.delete.setOnClickListener(v -> listener.onDeleteButtonPressed(position));
         holder.edit.setOnClickListener(v -> {
             listener.onEditButtonPressed(position);
