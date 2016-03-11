@@ -1,6 +1,5 @@
 package philoats.celerysplit.presenters;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -302,7 +301,7 @@ public class TimerPresenter implements Presenter, SharedPreferences.OnSharedPref
         return loadedSplits.getCount();
     }
 
-    public void getPrefs(SharedPreferences sharedPreferences){
+    public void getPrefs(SharedPreferences sharedPreferences) {
         showGraphSubject.onNext(sharedPreferences.getBoolean("showGraph", false));
         showLastSplitSubject.onNext(sharedPreferences.getBoolean("showLastSplit", false));
     }

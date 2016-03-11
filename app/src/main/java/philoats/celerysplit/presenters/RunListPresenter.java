@@ -1,4 +1,5 @@
 package philoats.celerysplit.presenters;
+
 import android.content.Context;
 
 import java.util.ArrayList;
@@ -18,12 +19,13 @@ public class RunListPresenter implements Presenter, EditRunPresenter.EditListene
     private RunDataAccess dataAccess;
     private Action1<SplitSet> onLoadSplits;
 
-    private BehaviorSubject<ArrayList<Run>> runSubject;
-    public Observable<ArrayList<Run>> runObservable() {
+    private BehaviorSubject<RunDataEvent> runSubject;
+
+    public Observable<RunDataEvent> runObservable() {
         return runSubject;
     }
 
-    public RunListPresenter(Context context, Action1<SplitSet> onLoadSplits){
+    public RunListPresenter(Context context, Action1<SplitSet> onLoadSplits) {
         //this.parent = fragment;
         this.onLoadSplits = onLoadSplits;
         runSubject = BehaviorSubject.create();
@@ -34,7 +36,7 @@ public class RunListPresenter implements Presenter, EditRunPresenter.EditListene
         dataAccess.getRuns().subscribe(runs -> runSubject.onNext(new RunDataEvent(runs)));
     }
 
-    public void onDetach(){
+    public void onDetach() {
         onLoadSplits = null;
     }
 
@@ -59,12 +61,12 @@ public class RunListPresenter implements Presenter, EditRunPresenter.EditListene
         dataAccess.getRuns().subscribe(runs -> runSubject.onNext(new RunDataEvent(index, RunDataEvent.DELETED, runs)));
     }
 
-    public void exportFile(Context context, Run run){
+    public void exportFile(Context context, Run run) {
         RunFileHelper fileHelper = new RunFileHelper(context);
         dataAccess.getSet((run)).subscribe(fileHelper::exportFile);
     }
 
-    public void importFile(Context context, String name){
+    public void importFile(Context context, String name) {
         RunFileHelper fileHelper = new RunFileHelper(context);
         fileHelper.importFile(name).subscribe(dataAccess::addRun);
     }

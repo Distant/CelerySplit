@@ -37,13 +37,13 @@ public class SplitSet {
         this._id = _id;
         int count = names.length;
         segments = new ArrayList<>();
-        for (int i = 0; i < names.length; i++){
-            segments.add(new Segment(names[i], pbs == null ? -1: pbs[i], best == null ? -1 : best[i]));
+        for (int i = 0; i < names.length; i++) {
+            segments.add(new Segment(names[i], pbs == null ? -1 : pbs[i], best == null ? -1 : best[i]));
         }
 
         bestSegmentsCum = new long[count];
         long total = 0;
-        for (int i = 0; i < count; i++){
+        for (int i = 0; i < count; i++) {
             total += getBestTimes()[i];
             bestSegmentsCum[i] = total;
         }
@@ -58,7 +58,7 @@ public class SplitSet {
         return segments.size();
     }
 
-    public long getId(){
+    public long getId() {
         return _id;
     }
 
@@ -66,43 +66,43 @@ public class SplitSet {
         return title;
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         this.title = title;
     }
 
-    public long[] getPbTimes(){
+    public long[] getPbTimes() {
         long[] p = new long[getCount()];
-        for (int i = 0; i < getCount(); i++){
+        for (int i = 0; i < getCount(); i++) {
             p[i] = segments.get(i).pb;
         }
         return p;
     }
 
-    public long[] getBestTimes(){
+    public long[] getBestTimes() {
         long[] p = new long[getCount()];
-        for (int i = 0; i < getCount(); i++){
+        for (int i = 0; i < getCount(); i++) {
             p[i] = segments.get(i).best;
         }
         return p;
     }
 
-    public String[] getNames(){
+    public String[] getNames() {
         String[] n = new String[getCount()];
-        for (int i = 0; i < getCount(); i++){
+        for (int i = 0; i < getCount(); i++) {
             n[i] = segments.get(i).name;
         }
         return n;
     }
 
-    public String getName(int position){
+    public String getName(int position) {
         return segments.get(position).name;
     }
 
-    public Long getPbTime(int position){
+    public Long getPbTime(int position) {
         return segments.get(position).pb;
     }
 
-    public Long getBestTime(int position){
+    public Long getBestTime(int position) {
         return segments.get(position).best;
     }
 
@@ -128,11 +128,12 @@ public class SplitSet {
     public void update(long time, int curSplit) {
         tempPB[curSplit] = time;
         long tempSeg = curSplit == 0 ? time : (time - tempPB[curSplit - 1]);
-        if (segments.get(curSplit).best == -1 || tempSeg < segments.get(curSplit).best) tempBest[curSplit] = tempSeg;
+        if (segments.get(curSplit).best == -1 || tempSeg < segments.get(curSplit).best)
+            tempBest[curSplit] = tempSeg;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return title + ": " + getCount() + " splits. ";
     }
 
@@ -140,19 +141,19 @@ public class SplitSet {
         return new SplitSet("", new String[]{});
     }
 
-    public void addSegment(String name, long pb, long best){
-       segments.add(new Segment(name, pb, best));
+    public void addSegment(String name, long pb, long best) {
+        segments.add(new Segment(name, pb, best));
     }
 
-    public void addSegment(int position, String name, long pb, long best){
+    public void addSegment(int position, String name, long pb, long best) {
         segments.add(position, new Segment(name, pb, best));
     }
 
-    public void updateSegment(int position, String name, long pb, long best){
+    public void updateSegment(int position, String name, long pb, long best) {
         segments.set(position, new Segment(name, pb, best));
     }
 
-    public void deleteSegment(int position){
+    public void deleteSegment(int position) {
         segments.remove(position);
     }
 
@@ -162,7 +163,7 @@ public class SplitSet {
         private long pb;
         private long best;
 
-        private Segment(String name, long pb, long best){
+        private Segment(String name, long pb, long best) {
             this.name = name;
             this.pb = pb;
             this.best = best;
