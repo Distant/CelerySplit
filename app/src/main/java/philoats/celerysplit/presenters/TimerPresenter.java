@@ -94,11 +94,13 @@ public class TimerPresenter implements Presenter, SharedPreferences.OnSharedPref
     }
 
     public void setLoadedSplits(SplitSet splits) {
-        this.loadedSplits = splits;
-        resetDisplayTimes(splits);
-        this.reset();
-        setTimerState(TimerEvent.RESET);
-        splitsLoaded.onNext(true);
+        if (splits.getCount() > 0) {
+            this.loadedSplits = splits;
+            resetDisplayTimes(splits);
+            this.reset();
+            setTimerState(TimerEvent.RESET);
+            splitsLoaded.onNext(true);
+        }
     }
 
     private void resetDisplayTimes(SplitSet splits) {
