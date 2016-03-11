@@ -97,9 +97,4 @@ public class BestTimerAdapter extends ArrayAdapter<String> {
             timeText = (TextView) view.findViewById(R.id.textRight);
         }
     }
-
-    public void replaceData(String[] data){
-        times = data;
-        notifyDataSetChanged();
-    }
 }
